@@ -22,6 +22,7 @@ return {
           "lua_ls",
           "marksman",
           "stylelint_lsp",
+          'stylua',
           "tailwindcss",
           "ts_ls",
           "ts_query_ls",

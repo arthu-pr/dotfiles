@@ -1,12 +1,38 @@
 -- Fuzzy Finder (files, lsp, etc)
+local file_exclude_options = {
+  defaults = {
+    file_ignore_patterns = { '^./node_modules/', 'node_modules/.*', '^./.nuxt/', '.nuxt/.*', '^./.output/', '.output/.*' },
+  }
+}
+
+function _G.TelescopeToggleIgnore()
+  if #file_exclude_options.defaults.file_ignore_patterns == 0 then
+    file_exclude_options.defaults.file_ignore_patterns = { "node_modules/" }
+  else
+    file_exclude_options.defaults.file_ignore_patterns = {}
+  end
+  require('telescope').setup(file_exclude_options)
+end
+
+vim.cmd([[ command! TelescopeToggleIgnore lua _G.TelescopeToggleIgnore() ]])
+
 local telescope = {
   'nvim-telescope/telescope.nvim',
   branch = '0.1.x',
   dependencies = { 'nvim-lua/plenary.nvim', 'BurntSushi/ripgrep' },
+  keys = {
+    { '<leader>sf', ':Telescope find_files<CR>',  desc = 'Search Files',           mode = 'n' },
+    { '<leader>sh', ':Telescope help_tags<CR>',   desc = 'Search Help',            mode = 'n' },
+    { '<leader>sw', ':Telescope grep_string<CR>', desc = 'Search Current Word',    mode = 'n' },
+    { '<leader>sg', ':Telescope live_grep<CR>',   desc = 'Search by Grep',         mode = 'n' },
+    { '<leader>sd', ':Telescope diagnostics<CR>', desc = 'Search Diagnostics',     mode = 'n' },
+    { '<leader>tt', ':TelescopeToggleIgnore<CR>', desc = 'Toggle Ignore Patterns', mode = 'n' },
+  },
   config = function()
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
     local gfh_actions = require('telescope').extensions.git_file_history.actions
+    local file_excude_from_options = file_exclude_options.defaults.file_ignore_patterns
 
     require('telescope').setup {
 
@@ -17,7 +43,7 @@ local telescope = {
             ['<C-d>'] = false,
           },
         },
-        file_ignore_patterns = { '^./node_modules/', 'node_modules/.*', '^./.nuxt/', '.nuxt/.*', '^./.output/', '.output/.*' },
+        file_ignore_patterns = file_excude_from_options,
       },
       pickers = {
         find_files = {
@@ -71,14 +97,14 @@ local telescope = {
     local builtin = require 'telescope.builtin'
     local wk = require 'which-key'
     wk.add {
-      { '<leader>s', group = 'telescope' },
-      { '<leader>sf', builtin.find_files, desc = 'Search Files' },
-      { '<leader>sh', builtin.help_tags, desc = 'Search Help' },
+      { '<leader>s',  group = 'telescope' },
+      { '<leader>sf', builtin.find_files,  desc = 'Search Files' },
+      { '<leader>sh', builtin.help_tags,   desc = 'Search Help' },
       { '<leader>sw', builtin.grep_string, desc = 'Search Current Word' },
-      { '<leader>sg', builtin.live_grep, desc = 'Search by Grep' },
+      { '<leader>sg', builtin.live_grep,   desc = 'Search by Grep' },
       { '<leader>sd', builtin.diagnostics, desc = 'Search Diagnostics' },
-      { '<leader>sb', builtin.builtin, desc = 'Search Builtins' },
-      { '<leader>?', builtin.oldfiles, desc = 'Search in Recently Opened Files' },
+      { '<leader>sb', builtin.builtin,     desc = 'Search Builtins' },
+      { '<leader>?',  builtin.oldfiles,    desc = 'Search in Recently Opened Files' },
       -- { "<leader>ss", ':Telescope luasnip<CR>', desc = "Search Snippets" },
     }
   end,
