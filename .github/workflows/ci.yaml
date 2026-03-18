@@ -1,0 +1,54 @@
+name: "Config CI"
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  install-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v6
+        with:
+          path: config
+          
+      - name: Set up Neovim and verify config
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+
+      - name: Verify symlinks
+        run: |
+          echo "--- Symlinks created in ~/.config ---"
+          ls -la "$HOME/.config/" | grep "^l" || echo "(no symlinks found)"
+          echo ""
+          test -L "$HOME/.config/nvim" \
+            && echo "OK: nvim -> $(readlink $HOME/.config/nvim)" \
+            || (echo "FAIL: nvim symlink missing" && exit 1)
+
+      - name: Test Neovim headless startup
+        run: |
+          timeout 30 nvim --headless "+qa!" 2>&1 | tee /tmp/nvim_test.log || true
+          EXIT_CODE=${PIPESTATUS[0]}
+          cat /tmp/nvim_test.log
+          if [[ $EXIT_CODE -ne 0 ]]; then
+            echo "FAIL: Neovim exited with code $EXIT_CODE"
+            exit 1
+          fi
+          echo "OK: Neovim started and quit cleanly"
+
+      - name: Test Neovim can load init.lua without errors
+        run: |
+          timeout 30 nvim --headless \
+            -c "lua vim.cmd('qa!')" \
+            2>&1 | tee /tmp/nvim_lua_test.log || true
+          if grep -qiE "error|E5113|stack traceback" /tmp/nvim_lua_test.log; then
+            echo "FAIL: Lua errors detected in Neovim startup"
+            cat /tmp/nvim_lua_test.log
+            exit 1
+          fi
+          echo "OK: No Lua errors on startup"
