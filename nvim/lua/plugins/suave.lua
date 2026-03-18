@@ -1,10 +1,10 @@
 return {
   'nyngwang/suave.lua',
-  config = function ()
+  config = function()
     require('suave').setup {
       -- menu_height = 6,
       auto_save = {
-        enabled = true,
+        enabled = false,
         -- exclude_filetypes = {},
       },
       store_hooks = {
@@ -25,7 +25,7 @@ return {
         },
         after_mksession = {
           -- NOTE: the `data` param is Lua table, which will be stored in json format under `.suave/` folder.
-          function (data)
+          function(data)
             -- store current colorscheme.
             data.colorscheme = vim.g.colors_name
           end,
@@ -33,16 +33,23 @@ return {
       },
       restore_hooks = {
         after_source = {
-          function (data)
-            if not data then return end
+          function(data)
+            if not data then
+              return
+            end
             -- restore colorscheme.
-            vim.cmd(string.format([[
+            vim.cmd(string.format(
+              [[
               color %s
               doau ColorScheme %s
-            ]], data.colorscheme, data.colorscheme))
+            ]],
+              data.colorscheme,
+              data.colorscheme
+            ))
           end,
         },
-      }
+      },
     }
-  end
+  end,
 }
+

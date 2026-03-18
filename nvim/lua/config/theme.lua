@@ -1,4 +1,3 @@
 -- vim.cmd("colorscheme kanagawa")
-vim.cmd.colorscheme "everforest"
--- vim.cmd.colorscheme "synthweave"
--- vim.cmd.colorscheme "kanagawa-wave"
+-- vim.cmd.colorscheme "everforest";
+vim.cmd 'colorscheme bearded'
