@@ -15,7 +15,8 @@ return {
         globalPlugins = {
           {
             name = "@vue/typescript-plugin",
-            location = "",
+            location = require("mason-registry").get_package("vue-language-server"):get_install_path()
+              .. "/node_modules/@vue/typescript-plugin",
             languages = { "vue" },
             configNamespace = "typescript",
             enableForWorkspaceTypeScriptVersions = true,
