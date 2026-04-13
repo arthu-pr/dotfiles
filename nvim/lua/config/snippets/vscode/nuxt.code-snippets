@@ -16,9 +16,27 @@
   // 	"description": "Log output to console"
   // }
   "ndata": {
-    "scope": "vue",
+    "scope": "vue, js, ts",
     "prefix": "!ndata",
     "body": "const { data: ${2:$1} } = useNuxtData('${1:key}')",
     "description": "Nuxt useNuxtData"
+  },
+  "todonuxt3": {
+    "scope": "vue, js, ts",
+    "prefix": "!nuxt3todo",
+    "body"  : [
+      "/**",
+      " * TODO-NUXT-3: ${1:description}",
+      " */"],
+      "description": "TODO comment for Nuxt 3 migration"
+  },  
+  "todo": {
+    "scope": "vue, js, ts",
+    "prefix": "!todo",
+    "body": [
+      "/**",
+      " * TODO: ${1:description}",
+      " */"],
+    "description": "TODO comment"
   }
 }

@@ -13,10 +13,10 @@ return {
 
   -- declarative keymaps → plugin only loads on first press
   keys = {
-    { "<leader>tda", "<cmd>TodoAdd<cr>",       desc = "Add Todo Comment" },
-    { "<leader>tdf", "<cmd>TodoNext<cr>",      desc = "Next Todo Comment" },
-    { "<leader>tdl", "<cmd>TodoLocList<cr>",   desc = "List Todo Comments" },
-    { "<leader>tdt", "<cmd>TodoTelescope<cr>", desc = "Search Todo Comments" },
+    { "<leader>tda", "<cmd>TodoAdd<cr>",     desc = "Add Todo Comment" },
+    { "<leader>tdf", "<cmd>TodoNext<cr>",    desc = "Next Todo Comment" },
+    { "<leader>tdl", "<cmd>TodoLocList<cr>", desc = "List Todo Comments" },
+    -- { "<leader>tdt", "<cmd>TodoTelescope<cr>", desc = "Search Todo Comments" },
   },
   opts = {
     signs = true,      -- show icons in the signs column

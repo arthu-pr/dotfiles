@@ -12,6 +12,7 @@ return {
       'html',
       'vue',
       'astro',
+      'css',
     },
     handlers = {
       definition = {

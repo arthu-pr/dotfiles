@@ -1,0 +1,10 @@
+-- ~/.config/nvim/lua/keymap_utils.lua
+local M = {}
+-- local vim = vim()
+
+M.theme = function(keys, func, desc)
+  local colorscheme = vim.colorscheme
+  vim.keymap.keymap_utils.config.theme.('n', keys, func, { desc = desc })
+end
+
+return M

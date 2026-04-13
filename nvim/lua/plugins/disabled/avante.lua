@@ -2,6 +2,8 @@
 
 -- https://github.com/yetone/avante.nvim?tab=readme-ov-file#default-setup-configuration
 local config = {
+  enabled = false,   -- requires telescope
+
   ---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
   ---@type Provider
   provider = "claude", -- The provider used in Aider mode or in the planning phase of Cursor Planning Mode
@@ -223,15 +225,15 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "MunifTanjim/nui.nvim",
+    'folke/snacks.nvim',
     --- The below dependencies are optional,
-    "nvim-mini/mini.pick",           -- for file_selector provider mini.pick
-    "nvim-telescope/telescope.nvim", -- for file_selector provider telescope
-    "hrsh7th/nvim-cmp",              -- autocompletion for avante commands and mentions
-    "ibhagwan/fzf-lua",              -- for file_selector provider fzf
-    "stevearc/dressing.nvim",        -- for input provider dressing
-    "folke/snacks.nvim",             -- for input provider snacks
-    "nvim-tree/nvim-web-devicons",   -- or echasnovski/mini.icons
-    "zbirenbaum/copilot.lua",        -- for providers='copilot'
+    -- "nvim-mini/mini.pick",           -- for file_selector provider mini.pick
+    "hrsh7th/nvim-cmp",            -- autocompletion for avante commands and mentions
+    "ibhagwan/fzf-lua",            -- for file_selector provider fzf
+    "stevearc/dressing.nvim",      -- for input provider dressing
+    "folke/snacks.nvim",           -- for input provider snacks
+    "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+    "zbirenbaum/copilot.lua",      -- for providers='copilot'
     {
       -- support for image pasting
       "HakonHarnes/img-clip.nvim",

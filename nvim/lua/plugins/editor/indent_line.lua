@@ -9,13 +9,12 @@ return {
     indent = {
       char = '·',
       -- tab_char = { 'a', 'b', 'c' },
-      -- highlight = { 'Function', 'Label' },
+      highlight = { 'Function', 'Label', 'NonText' },
       -- highlight = { 'Label' },
-      highlight = 'NonText',
       smart_indent_cap = true,
       priority = 2,
       repeat_linebreak = false,
     },
-    scope = { enabled = false },
+    -- scope = { enabled = true, highlight = 'NonText', show_start = true, show_end = true, priority = 1, 'Function', 'Label' },
   },
 }

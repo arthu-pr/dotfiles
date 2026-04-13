@@ -4,7 +4,7 @@ return {
     "nvim-lua/plenary.nvim", -- required
 
     -- Only one of these is needed.
-    "nvim-telescope/telescope.nvim", -- optional
+    "folke/snacks.nvim", -- optional, for picker integration
   },
 
   cmd = "Neogit",

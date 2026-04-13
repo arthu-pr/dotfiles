@@ -1,57 +1,17 @@
 {
-  // Place your snippets for typescript here. Each snippet is defined under a snippet name and has a prefix, body and
-  // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
-  // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the
-  // same ids are connected.
-  // Example:
   "Print to console": {
     "prefix": "log",
     "body": ["console.log('$1');", "$2"],
     "description": "Log output to console"
   },
-  "console.log": {
-    "prefix": "!cl",
-    "body": ["console.log('$1');"]
-  },
-  "console.group": {
-    "prefix": "!clg",
-    "body": [
-      "console.group(`$0`)",
-      "// Do another logging...",
-      "console.groupEnd()"
-    ]
-  },
-  "console.table": {
-    "prefix": "!clt",
-    "body": ["console.table('$2')"]
-  },
-  "console.dir": {
-    "prefix": "!cld",
-    "body": ["console.dir('$1')"]
-  },
-  "console.log purple": {
-    "prefix": "!clp",
-    "body": ["console.log('$1', 'color: purple, font-weight: bold');"]
-  },
-  "console.log red": {
-    "prefix": "!clr",
-    "body": [
-      "console.log('%c$1', 'color: white; background-color: #c0272d, font-weight: bold', $2);"
-    ]
-  },
-  "Import external module.": {
+  "Import external module": {
     "prefix": "import statement",
     "body": ["import { $0 } from \"${1:module}\";"],
-    "description": "Import external module."
+    "description": "Import external module"
   },
   "If Statement": {
     "prefix": "if",
     "body": ["if (${1:condition}) {", "\t$0", "}"],
     "description": "If Statement"
-  },
-  "todonuxt3": {
-    "prefix": "!todonuxt3",
-    "body": "// TODO-NUXT-3: ${1:description}",
-    "description": "TODO comment for Nuxt 3 migration"
   }
 }

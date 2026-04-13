@@ -27,11 +27,11 @@ return {
       -- TODO: TO VERIFY
       auto_install = true,
       -- List of parsers to ignore installing (or "all")
-      ignore_install = {},
+      -- ignore_install = {},
       highlight = { enable = true },
       indent = { enable = true },
       incremental_selection = {
-        enable = true,
+        enable = false,
         keymaps = {
           init_selection = '<c-space>',
           node_incremental = '<c-space>',
@@ -39,6 +39,16 @@ return {
           node_decremental = '<M-space>',
         },
       },
+      -- indent = { enable = true },
+      -- incremental_selection = {
+      --   enable = true,
+      --   keymaps = {
+      --     init_selection = '<c-space>',
+      --     node_incremental = '<c-space>',
+      --     scope_incremental = '<c-s>',
+      --     node_decremental = '<M-space>',
+      --   },
+      -- },
     }
   end,
 }

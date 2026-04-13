@@ -1,8 +1,9 @@
 -- https://github.com/FeiyouG/commander.nvim
 return {
   'FeiyouG/commander.nvim',
+  enabled = false, -- requires telescope
   dependencies = {
-    'nvim-telescope/telescope.nvim',
+    -- 'nvim-telescope/telescope.nvim',
   },
   keys = {
     { '<leader>fc', '<CMD>Telescope commander<CR>', mode = 'n' },

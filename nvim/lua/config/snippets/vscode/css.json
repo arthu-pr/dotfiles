@@ -20,5 +20,40 @@
       "}"
     ],
     "description": "Flexbox Holy Albatross layout utility"
+  },
+  "Flow layout": {
+    "prefix": "!flow, .flow",
+    "body": [
+      "/**",
+      " * Flow Layout",
+      " * Add consistent spacing between direct children of an element, but",
+      " * omitting the space before the first child.",
+      " *",
+      " * See: https://piccalil.li/blog/my-favourite-3-lines-of-css/ or https://every-layout.dev/layouts/stack/",
+      " */",
+      "",
+      ".flow > * + * {",
+      "\tmargin-top: var(--_flow-space, 1em);",
+      "}",
+      ""
+    ]
+  },
+  "Cluster layout": {
+    "prefix": "!cluster, .cluster",
+    "body": [
+      "/*",
+      "\tCluster Layout",
+      "\t-----------------------------",
+      "\tA layout for grouping items together with consistent spacing.",
+      "*/",
+      ".cluster {",
+      "\tdisplay: flex;",
+      "\tflex-wrap: wrap;",
+      "\tgap: var(--_cluster-gap);",
+      "\talign-items: center;",
+      "\tjustify-content: flex-start;",
+      "}",
+      ""
+    ]
   }
 }

@@ -19,7 +19,8 @@ end
 ---healthcheck lsp diagnostics shortcuts
 nmap('<leader>cl', ':checkhealth lsp<CR>', 'LSP Check Health')
 
-
+--  local nmap = require('utils').nmap
+nmap('<leader>ca', vim.lsp.buf.code_action, 'Code action')
 ------- Git ------------------------------------------------
 
 -- Diffview
@@ -27,10 +28,9 @@ nmap('<leader>gd', function()
   require('diffview').open { file_panel = { width = 35 } }
 end, 'Open Diffview')
 
--- Telescope Git Pickers
-local builtin = require 'telescope.builtin'
-nmap('<leader>gs', builtin.git_status, '[G]it [S]tatus')
-nmap('<leader>gst', builtin.git_stash, '[G]it [S]tash')
+-- Git Pickers (Snacks)
+nmap('<leader>gs', function() Snacks.picker.git_status() end, '[G]it [S]tatus')
+nmap('<leader>gst', function() Snacks.picker.git_stash() end, '[G]it [S]tash')
 
 -- Neogit
 -- local neogit = require 'neogit'

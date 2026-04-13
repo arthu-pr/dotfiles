@@ -3,6 +3,16 @@
   "contributes": {
     "snippets": [
       {
+        "language": [
+          "html",
+          "css",
+          "javascript",
+          "typescript",
+          "vue"
+        ],
+        "path": "./web.code-snippets"
+      },
+      {
         "language": "typescript",
         "path": "./typescript.json"
       },
