@@ -15,6 +15,11 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: config
+
+      - name: Run symlinks setup
+        run: |
+          cd config
+          yes | bash ./set_symbolic_links.sh
           
       - name: Set up Neovim and verify config
         uses: rhysd/action-setup-vim@v1
