@@ -5,14 +5,22 @@ return {
     explorer = {},
   },
   keys = {
-    -- Top Pickers & Explorer
+    -- Dashboard
     {
-      '<leader><space>',
+      '<leader><leader>',
       function()
-        Snacks.picker.smart()
+        Snacks.dashboard()
       end,
-      desc = 'Smart Find Files',
+      desc = 'Dashboard',
     },
+    -- Top Pickers & Explorer
+    -- {
+    --   '<leader><space>',
+    --   function()
+    --     Snacks.picker.smart()
+    --   end,
+    --   desc = 'Smart Find Files',
+    -- },
     {
       '<leader>,',
       function()
@@ -20,13 +28,6 @@ return {
       end,
       desc = 'Buffers',
     },
-    -- {
-    --   '<leader>/',
-    --   function()
-    --     Snacks.picker.grep()
-    --   end,
-    --   desc = 'Grep',
-    -- },
     {
       '<leader>:',
       function()
@@ -34,21 +35,20 @@ return {
       end,
       desc = 'Command History',
     },
-    -- {
-    --   '<leader>n',
-    --   function()
-    --     Snacks.picker.notifications()
-    --   end,
-    --   desc = 'Notification History',
-    -- },
-    -- {
-    --   '<leader>e',
-    --   function()
-    --     Snacks.explorer()
-    --   end,
-    --   desc = 'File Explorer',
-    -- },
-    -- find
+    {
+      '<leader>n',
+      function()
+        Snacks.picker.notifications()
+      end,
+      desc = 'Notification History',
+    },
+    {
+      '<leader>e',
+      function()
+        Snacks.explorer()
+      end,
+      desc = 'File Explorer',
+    },
     {
       '<leader>fb',
       function()
@@ -56,15 +56,15 @@ return {
       end,
       desc = 'Buffers',
     },
-    -- {
-    --   '<leader>fc',
-    --   function()
-    --     Snacks.picker.files { cwd = vim.fn.stdpath 'config' }
-    --   end,
-    --   desc = 'Find Config File',
-    -- },
     {
-      '<leader>ff',
+      '<leader>fc',
+      function()
+        Snacks.picker.files { cwd = vim.fn.stdpath 'config' }
+      end,
+      desc = 'Find Config File',
+    },
+    {
+      '<leader>sf',
       function()
         Snacks.picker.files()
       end,
@@ -85,7 +85,7 @@ return {
       desc = 'Projects',
     },
     {
-      '<leader>fr',
+      '<leader>?',
       function()
         Snacks.picker.recent()
       end,
@@ -185,13 +185,13 @@ return {
       end,
       desc = 'Grep Open Buffers',
     },
-    -- {
-    --   '<leader>sg',
-    --   function()
-    --     Snacks.picker.grep()
-    --   end,
-    --   desc = 'Grep',
-    -- },
+    {
+      '<leader>sg',
+      function()
+        Snacks.picker.grep()
+      end,
+      desc = 'Grep',
+    },
     {
       '<leader>sw',
       function()
@@ -201,13 +201,13 @@ return {
       mode = { 'n', 'x' },
     },
     -- search
-    {
-      '<leader>s"',
-      function()
-        Snacks.picker.registers()
-      end,
-      desc = 'Registers',
-    },
+    -- {
+    --   '<leader>s"',
+    --   function()
+    --     Snacks.picker.registers()
+    --   end,
+    --   desc = 'Registers',
+    -- },
     {
       '<leader>s/',
       function()
@@ -378,27 +378,27 @@ return {
     --   end,
     --   desc = 'Goto Implementation',
     -- },
-    {
-      'gy',
-      function()
-        Snacks.picker.lsp_type_definitions()
-      end,
-      desc = 'Goto T[y]pe Definition',
-    },
-    {
-      'gai',
-      function()
-        Snacks.picker.lsp_incoming_calls()
-      end,
-      desc = 'C[a]lls Incoming',
-    },
-    {
-      'gao',
-      function()
-        Snacks.picker.lsp_outgoing_calls()
-      end,
-      desc = 'C[a]lls Outgoing',
-    },
+    -- {
+    --   'gy',
+    --   function()
+    --     Snacks.picker.lsp_type_definitions()
+    --   end,
+    --   desc = 'Goto T[y]pe Definition',
+    -- },
+    -- {
+    --   'gai',
+    --   function()
+    --     Snacks.picker.lsp_incoming_calls()
+    --   end,
+    --   desc = 'C[a]lls Incoming',
+    -- },
+    -- {
+    --   'gao',
+    --   function()
+    --     Snacks.picker.lsp_outgoing_calls()
+    --   end,
+    --   desc = 'C[a]lls Outgoing',
+    -- },
     {
       '<leader>ss',
       function()
@@ -413,5 +413,5 @@ return {
       end,
       desc = 'LSP Workspace Symbols',
     },
-  },
+  }
 }

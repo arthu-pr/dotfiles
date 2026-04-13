@@ -9,9 +9,10 @@ return {
     require('lualine').setup {
       options = {
         icons_enabled = true,
-        theme = require('bearded.plugins.lualine').theme(bearded.palette()),
+        -- theme = require('bearded.plugins.lualine').theme(bearded.palette()),
         component_separators = '|',
         section_separators = '',
+        theme = 'tokyonight',
       },
       tabline = { lualine_a = {}, lualine_b = { 'branch' }, lualine_c = { 'filename' }, lualine_x = {}, lualine_y = {}, lualine_z = {} },
     }

@@ -26,39 +26,21 @@ return {
   filetypes = { 'vue' },
   root_markers = { 'package.json' },
   on_init = function(client)
-    local retries = 0
+    client.handlers['tsserver/request'] = function(_, result, context)
+      local vtsls_clients = vim.lsp.get_clients({ bufnr = context.bufnr, name = 'vtsls' })
+      local clients = {}
 
-    ---@param _ lsp.ResponseError
-    ---@param result any
-    ---@param context lsp.HandlerContext
-    local function typescriptHandler(_, result, context)
-      -- https://github.com/pmizio/typescript-tools.nvim/issues/361
-      -- typescript-tools is using a deprecated method to register LSP,
-      -- which is not working with neovim >= 0.11.2 that changed the way to register LSP.
-      -- TODO: follow github issue to see if it is fixed
-      -- https://github.com/arthur-plazanet/dotfiles/commit/36cd6fd0502470fecd6e681eefc75ccc1433c603#diff-9ceda82202babac8df1bb179fff4aa71d60c3eb38d7db5529d9f0b04e72cf440R4
-      -- local ts_client = vim.lsp.get_clients({ bufnr = context.bufnr, name = 'typescript-tools' })[1]
-      local ts_client = vim.lsp.get_clients({ bufnr = context.bufnr, name = 'vtsls' })[1]
-          or vim.lsp.get_clients({ bufnr = context.bufnr, name = 'ts_ls' })[1]
+      vim.list_extend(clients, vtsls_clients)
 
-      if not ts_client then
-        -- there can sometimes be a short delay until `ts_ls`/`vtsls` are attached so we retry for a few times until it is ready
-        if retries <= 10 then
-          retries = retries + 1
-          vim.defer_fn(function()
-            typescriptHandler(_, result, context)
-          end, 100)
-        else
-          vim.notify(
-            'Could not find `ts_ls`, `vtsls`, or `typescript-tools` lsp client required by `vue_ls`.',
-            vim.log.levels.ERROR
-          )
-        end
+      if #clients == 0 then
+        vim.notify('Could not find `vtsls` or `ts_ls` lsp client, `vue_ls` would not work without it.',
+          vim.log.levels.ERROR)
         return
       end
+      local ts_client = clients[1]
 
-      local param = unpack(result)
-      local id, command, payload = unpack(param)
+      local param = table.unpack(result)
+      local id, command, payload = table.unpack(param)
       ts_client:exec_cmd({
         title = 'vue_request_forward', -- You can give title anything as it's used to represent a command in the UI, `:h Client:exec_cmd`
         command = 'typescript.tsserverRequest',
@@ -67,12 +49,14 @@ return {
           payload,
         },
       }, { bufnr = context.bufnr }, function(_, r)
-        local response_data = { { id, r and r.body } }
+        local response = r and r.body
+        -- TODO: handle error or response nil here, e.g. logging
+        -- NOTE: Do NOT return if there's an error or no response, just return nil back to the vue_ls to prevent memory leak
+        local response_data = { { id, response } }
+
         ---@diagnostic disable-next-line: param-type-mismatch
         client:notify('tsserver/response', response_data)
       end)
     end
-
-    client.handlers['tsserver/request'] = typescriptHandler
   end,
 }

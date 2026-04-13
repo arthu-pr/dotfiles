@@ -1,5 +1,6 @@
 return {
   'goolord/alpha-nvim',
+  enabled = false,
   -- dependencies = { 'echasnovski/mini.icons' },
   config = function()
     --[[ startify configurations ]]
@@ -61,14 +62,15 @@ return {
       [[`--' '--' `--`--' `---'  `---' `--'  `--'      `--'  `--' `---' `--' `----' ]]
     }
 
+    local snacks = require 'snacks'
+
     dashboard.section.buttons.val = {
       button('b', '📁 File tree', leader, '<cmd>NvimTreeToggle<CR>'),
-      button('f', '🥐 Recent files', leader, '<cmd>Telescope oldfiles<CR>'),
+      button('f', '🥐 Recent files', leader, snacks.picker.recent()),
       button('g', '  Neogit', leader, '<cmd>Neogit<cr>'),
-      button('s', '📌 Git status', leader, '<cmd>Telescope git_status<CR>'),
+      button('s', '📌 Git status', leader, snacks.picker.git_status()),
       button('l', '📦 Lazy Plugin Manager', leader, '<cmd>Lazy<CR>'),
       button('m', "🧱 Mason Package Manager", leader, ":Mason<CR>"),
-      button('s', "🖇️ Commander", leader, '<cmd>Telescope commander<CR>'),
       button('c', '⚙️ Open config', leader, '<cmd>e ~/config/nvim/<CR>'),
       button('q', '🚪 Quit', leader, '<cmd>qa<CR>')
     }

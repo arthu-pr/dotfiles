@@ -1,8 +1,9 @@
 return {
   'rguruprakash/simple-note.nvim',
+  enabled = false, -- requires telescope
   dependencies = {
     'nvim-lua/plenary.nvim',
-    'nvim-telescope/telescope.nvim',
+    -- 'nvim-telescope/telescope.nvim',
   },
   config = function()
     local simple_note = require('simple-note')

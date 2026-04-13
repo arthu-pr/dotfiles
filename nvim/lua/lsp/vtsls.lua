@@ -1,34 +1,41 @@
+local vue_language_server_path =
+    vim.fn.expand("$MASON/packages/vue-language-server/node_modules/@vue/language-server")
+
+local vue_plugin = {
+  name = "@vue/typescript-plugin",
+  location = vue_language_server_path,
+  languages = { "vue" },
+  configNamespace = "typescript",
+}
+
 return {
+  cmd = { 'vtsls', '--stdio' },
+  init_options = {
+    hostInfo = 'neovim',
+  },
   filetypes = {
-    "javascript",
-    "javascriptreact",
-    "javascript.jsx",
-    "typescript",
-    "typescriptreact",
-    "typescript.tsx",
-    "vue",
+    'javascript',
+    'javascriptreact',
+    'javascript.jsx',
+    'typescript',
+    'typescriptreact',
+    'typescript.tsx',
+    'vue',
   },
   settings = {
     vtsls = {
       autoUseWorkspaceTsdk = true,
       tsserver = {
         globalPlugins = {
-          {
-            name = "@vue/typescript-plugin",
-            location = require("mason-registry").get_package("vue-language-server"):get_install_path()
-              .. "/node_modules/@vue/typescript-plugin",
-            languages = { "vue" },
-            configNamespace = "typescript",
-            enableForWorkspaceTypeScriptVersions = true,
-          },
+          vue_plugin,
         },
       },
     },
     typescript = {
       preferences = {
-        importModuleSpecifier = "non-relative",
+        importModuleSpecifier = 'non-relative',
         updateImportsOnFileMove = {
-          enabled = "always",
+          enabled = 'always',
         },
         suggest = {
           completeFunctionCalls = true,
