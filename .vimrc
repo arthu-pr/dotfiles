@@ -1,3 +1,5 @@
+" vim9script
+
 " URL: https://vim.wikia.com/wiki/Example_vimrc
 " Authors: https://vim.wikia.com/wiki/Vim_on_Libera_Chat
 " Description: A minimal, but feature rich, example .vimrc. If you are a
@@ -166,6 +168,11 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 "------------------------------------------------------------
 " Own rules
+"
+" Set path for packages
+set runtimepath=~/.config/.vim
+set packpath=~/.config/.vim
+"set packpath=~/.vim8,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim8/after
 
 " https://stackoverflow.com/questions/16507777/set-encoding-and-fileencoding-to-utf-8-in-vim
 " Required for vim-devicons
@@ -185,7 +192,7 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists('s:std_in
 
 " Set block shape cursor for normal mode as .zpreztorc set a bar cursor in terminal
 if &term =~ 'xterm\|screen\|tmux'
-  let &t_SI = "\e[6 q"  " Insert mode - bar cursor
+  let &t_SI = "\e[6 q"  " Insert mode - block cursor
   let &t_SR = "\e[4 q"  " Replace mode - underscore cursor
   let &t_EI = "\e[2 q"  " Normal mode - block cursor
 endif
@@ -200,3 +207,29 @@ imap cll console.log()<Esc><S-f>(a
 vmap cll yocll<Esc>p
 " Console log from normal mode, inserted on next line with word your on inside parentheses
 nmap cll yiwocll<Esc>p
+"
+" Normally this if-block is not needed, because `:set nocp` is done
+" automatically when .vimrc is found. However, this might be useful
+" when you execute `vim -u .vimrc` from the command line.
+if &compatible
+  " `:set nocp` has many side effects. Therefore this should be done
+  " only when 'compatible' is set.
+  set nocompatible
+endif
+
+packadd minpac
+
+call minpac#init()
+
+" minpac must have {'type': 'opt'} so that it can be loaded with `packadd`.
+call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+" Add other plugins here.
+call minpac#add('vim-jp/syntax-vim-ex')
+
+call minpac#add('romainl/Apprentice')
+
+
+
+" Load the plugins right now. (optional)
+"packloadalld()

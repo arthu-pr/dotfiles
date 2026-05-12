@@ -14,56 +14,56 @@ CONFIG_DIR="$HOME/.config"                                          # Configurat
 HOME_FILES=(".vimrc" ".zpreztorc")                                  # List of files to link in the home directory
 TARGET_DIR="$HOME/config"                                           # Target directory for the symbolic links
 INCLUDE_DOTFILES="true"                                             # Include hidden files and directories by default
-EXCLUDE_FOLDERS=("set_symbolic_links.sh" "Code" ".git" "README.md") # Add folders to exclude
+
+
+
+
+  EXCLUDE_FOLDERS=("set_symbolic_links.sh" "Code" ".git" "README.md" "macos") # Add folders to exclude
 
 read -p "Enter your configuration directory (default $CONFIG_DIR): " custom_config_dir
 read -p "Enter the target directory for symbolic links (default $TARGET_DIR): " custom_target_dir
 
-# Use custom values if provided
 if [[ -n "$custom_config_dir" ]]; then
   CONFIG_DIR="$custom_config_dir"
 fi
 
 if [[ -n "$custom_target_dir" ]]; then
   TARGET_DIR="$custom_target_dir"
-  mkdir -p "$TARGET_DIR"
 fi
 
-# https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
-shopt -s dotglob
+mkdir -p "$CONFIG_DIR"
+mkdir -p "$TARGET_DIR"
+
+if [[ "$INCLUDE_DOTFILES" == "true" ]]; then
+  shopt -s dotglob
+fi
 shopt -s nullglob
-array=(*)
 
 # Function to create symbolic links
 create_symlink() {
   local source=$1
   local target=$2
 
-  # Check if the source exists, and ask for confirmation to overwrite
-  if [[ -e "$target" ]]; then
+  if [[ ! -e "$source" ]]; then
+    echo "Source does not exist: $source"
+    return
+  fi
+
+  if [[ -e "$target" || -L "$target" ]]; then
     echo "A file or directory already exists at $target."
-    read -p "Do you want to overwrite it with a symbolic link? (Y/n): " reply
+    read -p "Do you want to overwrite it with a symbolic link? (y/N): " reply
 
     if [[ "$reply" != "y" && "$reply" != "Y" ]]; then
-      echo "Skipping $source."
+      echo "Skipping $target."
       return
     fi
 
-    if [[ -d "$target" ]]; then
-      rm -rf "$target"
-    else
-      rm "$target"
-    fi
+    rm -rf "$target"
   fi
 
-  echo "Creating symbolic link for $source."
-
-  if [[ ! -e "$target" ]]; then
-    echo "Creating directory $target"
-    mkdir -p "$(dirname "$target")"
-  fi
-
+  mkdir -p "$(dirname "$target")"
   ln -s "$source" "$target"
+  echo "Linked $target -> $source"
 }
 
 # Check if entry is in HOME_FILES, and if so, we return 0
@@ -77,20 +77,21 @@ is_home_file() {
   return 1
 }
 
-# Process regular files and directories in CONFIG_DIR
-for entry in "${array[@]}"; do
-  if [[ " ${EXCLUDE_FOLDERS[@]} " =~ " ${entry} " ]]; then
+# Process regular files and directories in TARGET_DIR
+for entry_path in "$TARGET_DIR"/*; do
+  entry="$(basename "$entry_path")"
+
+  if [[ " ${EXCLUDE_FOLDERS[*]} " =~ [[:space:]]${entry}[[:space:]] ]]; then
     echo "Skipping excluded folder: $entry."
     continue
   fi
 
-  # Skip if the entry is a home file (e.g. .vimrc, .zpreztorc) using is_home_file()
   if is_home_file "$entry"; then
     echo "Skipping $entry for $CONFIG_DIR."
     continue
   fi
 
-  create_symlink "$TARGET_DIR/$entry" "$CONFIG_DIR/$entry"
+  create_symlink "$entry_path" "$CONFIG_DIR/$entry"
 done
 
 # Process special home directory files
@@ -98,7 +99,27 @@ for file in "${HOME_FILES[@]}"; do
   create_symlink "$TARGET_DIR/$file" "$HOME/$file"
 done
 
-# Disable dotglob if it was enabled
+# Process macOS-specific files
+IS_MACOS="false"
+if [[ "$(uname)" == "Darwin" ]]; then
+  IS_MACOS="true"
+else
+  read -p "This does not appear to be macOS. Include macOS-specific configs anyway? (y/N): " macos_reply
+  if [[ "$macos_reply" == "y" || "$macos_reply" == "Y" ]]; then
+    IS_MACOS="true"
+  fi
+fi
+
+if [[ "$IS_MACOS" == "true" && -d "$TARGET_DIR/macos" ]]; then
+  for file in "$TARGET_DIR"/macos/* "$TARGET_DIR"/macos/.*; do
+    filename="${file##*/}"
+    if [[ "$filename" == "." || "$filename" == ".." ]]; then
+      continue
+    fi
+    create_symlink "$file" "$HOME/$filename"
+  done
+fi
+
 if [[ "$INCLUDE_DOTFILES" == "true" ]]; then
   shopt -u dotglob
 fi

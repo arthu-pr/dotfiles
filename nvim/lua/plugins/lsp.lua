@@ -1,25 +1,25 @@
 -- lua/plugins/lsp.lua
 
 local lsp = {
-  "ansiblels",
-  "bashls",
-  "copilot",
-  "css_variables",
-  "cssls",
+  'ansiblels',
+  'bashls',
+  'copilot',
+  'css_variables',
+  'cssls',
   -- "emmet_ls",
-  "eslint",
-  "gh_actions_ls",
-  "html",
-  "jsonls",
-  "lua_ls",
-  "marksman",
-  "stylelint_lsp",
-  "stylua",
-  "tailwindcss",
-  "ts_query_ls",
-  "vtsls",
-  "vue_ls",
-  "yamlls"
+  'eslint',
+  'gh_actions_ls',
+  'html',
+  'jsonls',
+  'lua_ls',
+  'marksman',
+  'stylelint_lsp',
+  'stylua',
+  'tailwindcss',
+  'ts_query_ls',
+  'vtsls',
+  'vue_ls',
+  'yamlls',
 }
 return {
   -- LSP core
@@ -30,9 +30,7 @@ return {
     {
       'mason-org/mason-lspconfig.nvim',
       opts = {
-        ensure_installed =
-            lsp
-        ,
+        ensure_installed = lsp,
         -- Neovim 0.11+ feature: uses vim.lsp.enable() under the hood
         automatic_enable = {
           -- ts_ls excluded in favor of vtsls for Vue support
@@ -54,7 +52,6 @@ return {
 
     -- nvim-cmp capabilities
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
 
     -- Per-server tweaks (these MERGE with mason-lspconfig defaults)
 
@@ -84,19 +81,16 @@ return {
     -- })
 
     -- vtsls: TS/JS server (vue_ls starts automatically; its on_init bridges tsserver/request to vtsls)
-
-    -- SEE https://github.com/vuejs/language-tools/wiki/Neovim#configuration
-    local vue_language_server_path =
-        vim.fn.expand("$MASON/packages/vue-language-server/node_modules/@vue/language-server")
+    local vue_language_server_path = vim.fn.expand '$MASON/packages/vue-language-server/node_modules/@vue/language-server'
 
     local vue_plugin = {
-      name = "@vue/typescript-plugin",
+      name = '@vue/typescript-plugin',
       location = vue_language_server_path,
-      languages = { "vue" },
-      configNamespace = "typescript",
+      languages = { 'vue' },
+      configNamespace = 'typescript',
     }
 
-    vim.lsp.config("vtsls", {
+    vim.lsp.config('vtsls', {
       settings = {
         vtsls = {
           tsserver = {
@@ -106,7 +100,7 @@ return {
           },
         },
       },
-      filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+      filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
     })
     -- vim.lsp.enable({ 'vtsls', 'vue_ls' }) -- If using `ts_ls` replace `vtsls` to `ts_ls`
 
@@ -122,7 +116,7 @@ return {
     -- })
 
     -- -- Global LSP defaults that apply to *all* servers
-    vim.lsp.config("*", {
+    vim.lsp.config('*', {
       capabilities = capabilities,
     })
 
@@ -133,32 +127,83 @@ return {
     ---------------------------------------------------------------------------
     -- Diagnostics config
     ---------------------------------------------------------------------------
-    -- vim.diagnostic.config {
-    --   virtual_text = true,
-    --   update_in_insert = true,
-    --   underline = true,
-    --   severity_sort = true,
-    --   float = {
-    --     focusable = true,
-    --     style = 'minimal',
-    --     border = 'rounded',
-    --     source = true,
-    --     header = '',
-    --     prefix = '',
-    --   },
-    --   signs = {
-    --     text = {
-    --       [vim.diagnostic.severity.HINT] = ' ',
-    --       [vim.diagnostic.severity.INFO] = ' ',
-    --       [vim.diagnostic.severity.WARN] = ' ',
-    --       [vim.diagnostic.severity.ERROR] = ' ',
-    --     },
-    --   },
-    -- }
-
+    vim.diagnostic.config {
+      virtual_text = true,
+      update_in_insert = true,
+      underline = true,
+      severity_sort = true,
+      float = {
+        focusable = true,
+        style = 'minimal',
+        border = 'rounded',
+        source = true,
+        header = '',
+        prefix = '',
+      },
+      signs = {
+        text = {
+          [vim.diagnostic.severity.HINT] = ' ',
+          [vim.diagnostic.severity.INFO] = ' ',
+          [vim.diagnostic.severity.WARN] = ' ',
+          [vim.diagnostic.severity.ERROR] = ' ',
+        },
+      },
+    }
+    --
     ---------------------------------------------------------------------------
     -- LspAttach: keymaps + format-on-save + auto-import
     ---------------------------------------------------------------------------
+    vim.api.nvim_create_autocmd('LspAttach', {
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if not client then
+          return
+        end
+        local bufnr = args.buf
+        local map = function(mode, lhs, rhs, desc)
+          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+        end
+
+        map('n', 'K', vim.lsp.buf.hover, 'LSP Hover')
+        map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
+        map('n', 'gD', vim.lsp.buf.declaration, 'Go to declaration')
+        map('n', 'gi', vim.lsp.buf.implementation, 'Go to implementation')
+        map('n', 'gr', vim.lsp.buf.references, 'References')
+        map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename symbol')
+        map({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, 'Code action')
+        map('n', '<leader>f', function()
+          vim.lsp.buf.format { async = true }
+        end, 'Format buffer')
+        --     -- Format + autoimports on save
+        vim.api.nvim_create_autocmd('BufWritePre', {
+          buffer = args.buf,
+          callback = function()
+            -- NOTE: Disabled LSP formatting in favor of conform.nvim
+            if client:supports_method 'textDocument/formatting' then
+              vim.lsp.buf.format { bufnr = args.buf, id = client.id }
+            end
+
+            if client:supports_method 'textDocument/codeAction' then
+              local function apply_code_action(action_type)
+                local ctx = { only = action_type, diagnostics = {} }
+                local actions = vim.lsp.buf.code_action {
+                  context = ctx,
+                  apply = true,
+                  return_actions = true,
+                }
+
+                if actions and #actions > 0 then
+                  vim.lsp.buf.code_action { context = ctx, apply = true }
+                end
+              end
+
+              apply_code_action { 'source.fixAll' }
+              apply_code_action { 'source.organizeImports' }
+            end
+          end,
+        })
+      end,
+    })
     -- vim.api.nvim_create_autocmd('LspAttach', {
     --   desc = 'LSP actions',
     --   callback = function(args)
@@ -166,35 +211,6 @@ return {
     --     if not client then
     --       return
     --     end
-
-    --     -- Format + autoimports on save
-    --     vim.api.nvim_create_autocmd('BufWritePre', {
-    --       buffer = args.buf,
-    --       callback = function()
-    --         -- NOTE: Disabled LSP formatting in favor of conform.nvim
-    --         -- if client:supports_method("textDocument/formatting") then
-    --         --   vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-    --         -- end
-
-    --         if client:supports_method 'textDocument/codeAction' then
-    --           local function apply_code_action(action_type)
-    --             local ctx = { only = action_type, diagnostics = {} }
-    --             local actions = vim.lsp.buf.code_action {
-    --               context = ctx,
-    --               apply = true,
-    --               return_actions = true,
-    --             }
-
-    --             if actions and #actions > 0 then
-    --               vim.lsp.buf.code_action { context = ctx, apply = true }
-    --             end
-    --           end
-
-    --           apply_code_action { 'source.fixAll' }
-    --           apply_code_action { 'source.organizeImports' }
-    --         end
-    --       end,
-    --     })
 
     --     -- Keymaps
     --     local nmap = function(keys, func, desc)

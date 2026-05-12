@@ -57,6 +57,12 @@ alias nace="node ace"
 # Commands to find current Node processes
 alias findnodeports="lsof -nP -iTCP -sTCP:LISTEN | grep node"
 
+
+# Set the history timestamp format.
+HISTTIMEFORMAT="%F %T "
+
+
+# --------------------------------------------
 # Git aliases
 alias gitshowmestupid="echo 'git clean -fd'"
 alias gitfake="git add . && git commit -m 'fake'"
@@ -70,6 +76,17 @@ alias history="history"
 export HISTSIZE=2000
 SAVEHIST=$HISTSIZE
 
+# ------------------------------------------------------------
+# Ansible
+export PATH="/Users/arthur/Library/Python/3.9/bin:$PATH"
+# export ANSIBLE_CONFIG=~/.ansible/ansible.cfg
+export DEFAULT_HOST_LIST=~/.ansible/hosts
+# Ansible
+alias ansibleplaybook='ansible-playbook -i ~/.ansible/hosts.yml -e "@~/.ansible/secrets.yml" --vault-password-file ~/.ansible/vault_pass_file'
+
+# zellij path
+export PATH="$HOME/zellij-bin/bin:$PATH"
+
 # custom functions
 function mkcd() {
   mkdir "${1}" && cd "${1}"
@@ -80,13 +97,41 @@ function sitespeed() {
 }
 
 # Cursor as blinking bar
-export TERM=xterm
+# export TERM=xterm
 
 _fix_cursor() {
   echo -ne '\e[5 q'
 }
 
 precmd_functions+=(_fix_cursor)
+
+# --------------------------------------------
+# https://stackoverflow.com/a/30029855
+# List all listening ports, optionally filtering by a pattern
+listening() {
+   if [ $# -eq 0 ]; then
+        sudo lsof -iTCP -sTCP:LISTEN -n -P
+    elif [ $# -eq 1 ]; then
+        sudo lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color $1
+    else
+        echo "Usage: listening [pattern]"
+    fi
+}
+
+function worktree() {
+  current_dir=$(pwd)
+  wt_path="${1}"
+
+  (
+    cd "${current_dir}" &&
+    git worktree add "${wt_path}/${2}" "${2}" &&
+    cp .env "${wt_path}/${2}" &&
+    cd "${wt_path}/${2}" &&
+    # yarn &&
+    # yarn schema
+  )
+}
+
 
 # GPG
 export GPG_TTY=$(tty)
@@ -96,11 +141,11 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
-#
+# --------------------------------------------
 # Set additional custom rules if needed
 # source .zpreztorc.local only if it exists
 #
 if [ -f ~/.zpreztorc.local ]; then
   source ~/.zpreztorc.local
 fi
-HISTTIMEFORMAT="%F %T "
+

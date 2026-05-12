@@ -1,6 +1,7 @@
 [general]
 import = [
-    "./themes/kanagawa_wave.toml"
+    # "./themes/tokyo-night/storm.toml",
+    "./themes/nightfox/nordfox.toml",
 ]
 
 [font.bold]
@@ -19,3 +20,10 @@ style = "Italic"
 family = "FiraCode Nerd Font Mono"
 style = "Regular"
 
+[window]
+opacity = 0.9
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

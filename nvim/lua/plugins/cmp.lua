@@ -59,7 +59,7 @@ function M.opts()
   -- require('luasnip.loaders.from_vscode').lazy_load {
   --   paths = '~/config/nvim/lua/config/snippets/vscode',
   -- }
-  require("luasnip.loaders.from_vscode").lazy_load({ paths = "../config/snippets/vscode" })
+  require('luasnip.loaders.from_vscode').lazy_load { paths = '~/config/snippets/vscode' }
 
   -- Your custom Lua snippets
   require('luasnip.loaders.from_lua').lazy_load {
@@ -67,6 +67,7 @@ function M.opts()
   }
 
   cmp.setup {
+    enabled = false,
     snippet = {
       expand = function(args)
         -- This makes LSP snippet items actually expand
@@ -87,36 +88,44 @@ function M.opts()
       },
       -- You can still leave <Tab> free for Copilot
     },
-    -- formatting = {
-    --   format = function(entry, item)
-    --     local icons = LazyVim.config.icons.kinds
-    --     if icons[item.kind] then
-    --       item.kind = icons[item.kind] .. item.kind
-    --     end
+    formatting = {
+      format = function(entry, item)
+        local icons = LazyVim.config.icons.kinds
+        if icons[item.kind] then
+          item.kind = icons[item.kind] .. item.kind
+        end
 
-    --     local widths = {
-    --       abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
-    --       menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
-    --     }
+        local widths = {
+          abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
+          menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
+        }
 
-    --     for key, width in pairs(widths) do
-    --       if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
-    --         item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. '…'
-    --       end
-    --     end
+        for key, width in pairs(widths) do
+          if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
+            item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. '…'
+          end
+        end
 
-    --     return item
-    --   end,
-    -- },
+        return item
+      end,
+    },
     sources = {
       {
-        cmpIntegrationVue
+        cmpIntegrationVue,
       },
+      { name = "nvim_lsp" },
       { name = 'luasnip' }, -- <- this is how friendly-snippets show up
       -- add more (buffer, path, etc.) if you want
     },
-
   }
+
+  -- Example: SQL-specific completion (vim-dadbod)
+  cmp.setup.filetype("sql", {
+    sources = {
+      { name = "vim-dadbod-completion" },
+      { name = "buffer" },
+    },
+  })
 end
 
 return M

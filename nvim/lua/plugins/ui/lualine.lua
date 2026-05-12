@@ -1,5 +1,5 @@
-local bearded = require 'bearded'
-bearded.setup { flavor = 'feat-will' }
+-- local bearded = require 'bearded'
+-- bearded.setup { flavor = 'feat-will' }
 
 return {
   -- Set lualine as statusline
