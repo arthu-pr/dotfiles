@@ -1,3 +1,5 @@
+local Snacks = require 'snacks'
+
 return {
   'folke/snacks.nvim',
   opts = {
@@ -378,27 +380,27 @@ return {
     --   end,
     --   desc = 'Goto Implementation',
     -- },
-    -- {
-    --   'gy',
-    --   function()
-    --     Snacks.picker.lsp_type_definitions()
-    --   end,
-    --   desc = 'Goto T[y]pe Definition',
-    -- },
-    -- {
-    --   'gai',
-    --   function()
-    --     Snacks.picker.lsp_incoming_calls()
-    --   end,
-    --   desc = 'C[a]lls Incoming',
-    -- },
-    -- {
-    --   'gao',
-    --   function()
-    --     Snacks.picker.lsp_outgoing_calls()
-    --   end,
-    --   desc = 'C[a]lls Outgoing',
-    -- },
+    {
+      'gy',
+      function()
+        Snacks.picker.lsp_type_definitions()
+      end,
+      desc = 'Goto T[y]pe Definition',
+    },
+    {
+      'gai',
+      function()
+        Snacks.picker.lsp_incoming_calls()
+      end,
+      desc = 'C[a]lls Incoming',
+    },
+    {
+      'gao',
+      function()
+        Snacks.picker.lsp_outgoing_calls()
+      end,
+      desc = 'C[a]lls Outgoing',
+    },
     {
       '<leader>ss',
       function()
@@ -413,5 +415,14 @@ return {
       end,
       desc = 'LSP Workspace Symbols',
     },
-  }
+
+    -- CONFIG CUSTOM
+    {
+      '<leader>fe',
+      function()
+        Snacks.picker.icons { filter = { 'emoji' } }
+      end,
+      desc = 'Find Emoji',
+    },
+  },
 }
