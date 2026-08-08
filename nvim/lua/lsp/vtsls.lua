@@ -6,6 +6,10 @@ local vue_plugin = {
   location = vue_language_server_path,
   languages = { "vue" },
   configNamespace = "typescript",
+  -- Required with autoUseWorkspaceTsdk: workspace TS versions only probe
+  -- plugin locations for plugins that explicitly opt in; without this the
+  -- plugin fails to load and .vue files are parsed as raw TS
+  enableForWorkspaceTypeScriptVersions = true,
 }
 
 return {
@@ -16,10 +20,8 @@ return {
   filetypes = {
     'javascript',
     'javascriptreact',
-    'javascript.jsx',
     'typescript',
     'typescriptreact',
-    'typescript.tsx',
     'vue',
   },
   settings = {

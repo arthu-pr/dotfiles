@@ -9,7 +9,8 @@ return {
   end,
   config = function()
     require('bearded').setup {
-      flavor = 'feat-will',
+      flavor = 'feat-gold-d-raynh',
+      -- flavor = 'feet-will',
       transparent = true,
       bold = true,
       italic = true,

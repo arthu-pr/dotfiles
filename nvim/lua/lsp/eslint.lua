@@ -63,17 +63,14 @@ return {
   filetypes = {
     'javascript',
     'javascriptreact',
-    'javascript.jsx',
     'typescript',
     'typescriptreact',
-    'typescript.tsx',
     'vue',
     'astro',
     'htmlangular',
     'markdown',
-    'mdx',
+    'markdown.mdx',
     'yaml',
-    'yml',
   },
   workspace_required = true,
   on_attach = function(client, bufnr)

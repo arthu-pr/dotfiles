@@ -1,29 +1,36 @@
 [general]
 import = [
-    # "./themes/tokyo-night/storm.toml",
-    "./themes/nightfox/nordfox.toml",
+  # "./themes/tokyonight/storm.toml",
+   "./themes/tokyonight/storm.toml",
+  # "./themes/kanagawa_wave.toml.toml",
+  # "./themes/nightfox/nordfox.toml",
 ]
 
 [font.bold]
-family = "FiraCode Nerd Font Mono"
+family = "AporeticSerifMono Nerd Font"
 style = "Bold"
 
 [font.bold_italic]
-family =  "FiraCode Nerd Font Mono"
+family =  "AporeticSerifMono Nerd Font"
 style = "Bold Italic"
 
 [font.italic]
-family = "FiraCode Nerd Font Mono"
+family = "AporeticSerifMono Nerd Font"
 style = "Italic"
 
 [font.normal]
-family = "FiraCode Nerd Font Mono"
+family = "AporeticSerifMono Nerd Font"
 style = "Regular"
 
 [window]
-opacity = 0.9
+# opacity = 0.9
 
 [[keyboard.bindings]]
 key = "Return"
 mods = "Shift"
 chars = "\u001B\r"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Alt"
+action = "Paste"

@@ -31,13 +31,6 @@ return {
       desc = 'Buffers',
     },
     {
-      '<leader>:',
-      function()
-        Snacks.picker.command_history()
-      end,
-      desc = 'Command History',
-    },
-    {
       '<leader>n',
       function()
         Snacks.picker.notifications()
@@ -211,7 +204,7 @@ return {
     --   desc = 'Registers',
     -- },
     {
-      '<leader>s/',
+      '<leader>h/',
       function()
         Snacks.picker.search_history()
       end,
@@ -232,14 +225,14 @@ return {
       desc = 'Buffer Lines',
     },
     {
-      '<leader>sc',
+      '<leader>hc',
       function()
         Snacks.picker.command_history()
       end,
       desc = 'Command History',
     },
     {
-      '<leader>sC',
+      '<leader>C',
       function()
         Snacks.picker.commands()
       end,
@@ -337,7 +330,7 @@ return {
       desc = 'Resume',
     },
     {
-      '<leader>su',
+      '<leader>hu',
       function()
         Snacks.picker.undo()
       end,

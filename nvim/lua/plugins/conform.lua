@@ -1,0 +1,70 @@
+return {
+  'stevearc/conform.nvim',
+
+  event = { 'BufWritePre' },
+  cmd = { 'ConformInfo' },
+
+  keys = {
+    {
+      '<leader>f',
+      function()
+        require('conform').format {
+          async = true,
+          lsp_format = 'fallback',
+        }
+      end,
+      mode = { 'n', 'v' },
+      desc = 'Format buffer',
+    },
+  },
+
+  ---@module 'conform'
+  ---@type conform.setupOpts
+  opts = {
+    formatters_by_ft = {
+      lua = { 'stylua' },
+
+      javascript = { { 'prettierd', 'prettier' } },
+      javascriptreact = { { 'prettierd', 'prettier' } },
+
+      typescript = { { 'prettierd', 'prettier' } },
+      typescriptreact = { { 'prettierd', 'prettier' } },
+
+      vue = { { 'prettierd', 'prettier' } },
+
+      html = { { 'prettierd', 'prettier' } },
+      css = { { 'prettierd', 'prettier' } },
+
+      json = { { 'prettierd', 'prettier' } },
+      jsonc = { { 'prettierd', 'prettier' } },
+
+      markdown = { { 'prettierd', 'prettier' } },
+
+      yaml = { 'yamlfmt' },
+
+      sh = { 'shfmt' },
+      bash = { 'shfmt' },
+
+      svg = { { 'prettierd', 'prettier' } },
+    },
+
+    default_format_opts = {
+      lsp_format = 'fallback',
+    },
+
+    format_on_save = {
+      timeout_ms = 1000,
+      lsp_format = 'fallback',
+    },
+
+    formatters = {
+      shfmt = {
+        prepend_args = { '-i', '2' },
+      },
+    },
+  },
+
+  init = function()
+    vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+  end,
+}

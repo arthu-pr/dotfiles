@@ -1,137 +1,141 @@
 -- lua/plugins/lsp.lua
-
-local lsp = {
+local servers = {
   'ansiblels',
   'bashls',
-  'copilot',
+  'copilot', -- binary only; enable excluded below (copilot.vim provides ghost text)
   'css_variables',
   'cssls',
-  -- "emmet_ls",
   'eslint',
   'gh_actions_ls',
   'html',
   'jsonls',
   'lua_ls',
   'marksman',
-  'stylelint_lsp',
-  'stylua',
   'tailwindcss',
+  'ts_ls',
   'ts_query_ls',
+  -- vtsls is the TypeScript server (same tsserver as VS Code);
+  -- ts_ls stays installed but disabled below to avoid two TS servers per buffer
   'vtsls',
   'vue_ls',
   'yamlls',
 }
+
 return {
-  -- LSP core
   'neovim/nvim-lspconfig',
+
   dependencies = {
-    -- Mason v2
-    { 'mason-org/mason.nvim', opts = {} },
+    {
+      'mason-org/mason.nvim',
+      opts = {},
+    },
+
     {
       'mason-org/mason-lspconfig.nvim',
       opts = {
-        ensure_installed = lsp,
-        -- Neovim 0.11+ feature: uses vim.lsp.enable() under the hood
+        ensure_installed = servers,
         automatic_enable = {
-          -- ts_ls excluded in favor of vtsls for Vue support
-          exclude = { 'ts_ls' },
+          -- ts_ls: vtsls is the TS server
+          -- copilot: ghost text comes from github/copilot.vim; the LSP
+          -- client would be a duplicate doing nothing visible
+          exclude = { 'ts_ls', 'copilot' },
         },
       },
     },
 
-    { 'j-hui/fidget.nvim',    opts = {} },
-    'folke/neodev.nvim',
+    {
+      'j-hui/fidget.nvim',
+      opts = {},
+    },
 
-    -- capabilities for nvim-cmp
     'hrsh7th/cmp-nvim-lsp',
   },
 
   config = function()
-    -- optional: better Lua LSP for Neovim runtime
-    require('neodev').setup {}
+    ---------------------------------------------------------------------------
+    -- Capabilities
+    ---------------------------------------------------------------------------
 
-    -- nvim-cmp capabilities
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-    -- Per-server tweaks (these MERGE with mason-lspconfig defaults)
-
-    -- Tailwind
-    -- vim.lsp.config("tailwindcss", {
-    --   capabilities = capabilities,
-    --   filetypes = {
-    --     "javascript",
-    --     "javascriptreact",
-    --     "typescript",
-    --     "typescriptreact",
-    --     "vue",
-    --     "css",
-    --     "scss",
-    --   },
-    --   settings = {
-    --     tailwindCSS = {
-    --       classFunctions = { "cva", "cx" },
-    --       experimental = {
-    --         classRegex = {
-    --           "cva%(([^)]*)%)",
-    --           "[\"'`]([^\"'`]*)[\"'`]", -- keep if you want broad capture
-    --         },
-    --       },
-    --     },
-    --   },
-    -- })
-
-    -- vtsls: TS/JS server (vue_ls starts automatically; its on_init bridges tsserver/request to vtsls)
-    local vue_language_server_path = vim.fn.expand '$MASON/packages/vue-language-server/node_modules/@vue/language-server'
-
-    local vue_plugin = {
-      name = '@vue/typescript-plugin',
-      location = vue_language_server_path,
-      languages = { 'vue' },
-      configNamespace = 'typescript',
-    }
-
-    vim.lsp.config('vtsls', {
-      settings = {
-        vtsls = {
-          tsserver = {
-            globalPlugins = {
-              vue_plugin,
-            },
-          },
+    -- File watching is off by default on Linux; we have inotify-tools
+    -- installed so the efficient inotifywait backend is used
+    capabilities = vim.tbl_deep_extend('force', capabilities, {
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = true,
         },
       },
-      filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
     })
-    -- vim.lsp.enable({ 'vtsls', 'vue_ls' }) -- If using `ts_ls` replace `vtsls` to `ts_ls`
 
-    -- -- Vue / Volar v3 (vue_ls)
-    -- vim.lsp.config("vue_ls", {
-    --   capabilities = capabilities,
-    --   -- on_attach can be added if you need per-server behaviour
-    -- })
-
-    -- -- Emmet (HTML-like)
-    -- vim.lsp.config('emmet_ls', {
-    --   capabilities = capabilities,
-    -- })
-
-    -- -- Global LSP defaults that apply to *all* servers
     vim.lsp.config('*', {
       capabilities = capabilities,
     })
 
-    for _, server in ipairs(lsp) do
-      vim.lsp.enable(server)
+    -- Register per-server configs from lua/lsp/*.lua explicitly.
+    -- Explicit vim.lsp.config() calls take priority over lsp/ runtime files,
+    -- where nvim-lspconfig's defaults would win over ours for conflicting
+    -- keys like `filetypes` (e.g. vtsls needs 'vue' added).
+    for file in vim.fs.dir(vim.fn.stdpath('config') .. '/lua/lsp') do
+      local name = file:match('^(.+)%.lua$')
+      if name then
+        vim.lsp.config(name, require('lsp.' .. name))
+      end
     end
 
+    -- nvim-lspconfig's default list copies VSCode language ids
+    -- (django-html, ejs, jade, ...) that are not Neovim filetypes;
+    -- keep only the ones filetype detection can actually produce
+    vim.lsp.config('tailwindcss', {
+      filetypes = {
+        -- templating
+        'astro',
+        'blade',
+        'clojure',
+        'htmldjango',
+        'eelixir',
+        'elixir',
+        'eruby',
+        'haml',
+        'handlebars',
+        'heex',
+        'html',
+        'htmlangular',
+        'liquid',
+        'markdown',
+        'markdown.mdx',
+        'mustache',
+        'php',
+        'razor',
+        'twig',
+        -- css
+        'css',
+        'less',
+        'sass',
+        'scss',
+        'stylus',
+        -- js
+        'javascript',
+        'javascriptreact',
+        'rescript',
+        'typescript',
+        'typescriptreact',
+        'vue',
+        'svelte',
+        'templ',
+      },
+    })
+
     ---------------------------------------------------------------------------
-    -- Diagnostics config
+    -- Diagnostics
     ---------------------------------------------------------------------------
+
     vim.diagnostic.config {
       virtual_text = true,
       update_in_insert = true,
       underline = true,
       severity_sort = true,
+
       float = {
         focusable = true,
         style = 'minimal',
@@ -140,6 +144,7 @@ return {
         header = '',
         prefix = '',
       },
+
       signs = {
         text = {
           [vim.diagnostic.severity.HINT] = ' ',
@@ -149,127 +154,82 @@ return {
         },
       },
     }
-    --
+
     ---------------------------------------------------------------------------
-    -- LspAttach: keymaps + format-on-save + auto-import
+    -- LSP keymaps
     ---------------------------------------------------------------------------
+
+    local group = vim.api.nvim_create_augroup('UserLspConfig', {
+      clear = true,
+    })
+
     vim.api.nvim_create_autocmd('LspAttach', {
+      group = group,
+
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
+
         if not client then
           return
         end
+
         local bufnr = args.buf
+
         local map = function(mode, lhs, rhs, desc)
-          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+          vim.keymap.set(mode, lhs, rhs, {
+            buffer = bufnr,
+            silent = true,
+            desc = 'LSP: ' .. desc,
+          })
         end
 
-        map('n', 'K', vim.lsp.buf.hover, 'LSP Hover')
-        map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
-        map('n', 'gD', vim.lsp.buf.declaration, 'Go to declaration')
-        map('n', 'gi', vim.lsp.buf.implementation, 'Go to implementation')
+        -- Navigation
+        map('n', 'K', vim.lsp.buf.hover, 'Hover')
+        map('n', 'gd', vim.lsp.buf.definition, 'Definition')
+        map('n', 'gD', vim.lsp.buf.declaration, 'Declaration')
+        map('n', 'gi', vim.lsp.buf.implementation, 'Implementation')
         map('n', 'gr', vim.lsp.buf.references, 'References')
-        map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename symbol')
+
+        -- Actions
+        map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename')
+
         map({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, 'Code action')
-        map('n', '<leader>f', function()
-          vim.lsp.buf.format { async = true }
-        end, 'Format buffer')
-        --     -- Format + autoimports on save
-        vim.api.nvim_create_autocmd('BufWritePre', {
-          buffer = args.buf,
-          callback = function()
-            -- NOTE: Disabled LSP formatting in favor of conform.nvim
-            if client:supports_method 'textDocument/formatting' then
-              vim.lsp.buf.format { bufnr = args.buf, id = client.id }
-            end
 
-            if client:supports_method 'textDocument/codeAction' then
-              local function apply_code_action(action_type)
-                local ctx = { only = action_type, diagnostics = {} }
-                local actions = vim.lsp.buf.code_action {
-                  context = ctx,
-                  apply = true,
-                  return_actions = true,
-                }
+        -- Diagnostics
+        map('n', ']d', function()
+          vim.diagnostic.jump {
+            count = 1,
+            float = true,
+          }
+        end, 'Next diagnostic')
 
-                if actions and #actions > 0 then
-                  vim.lsp.buf.code_action { context = ctx, apply = true }
-                end
-              end
+        map('n', '[d', function()
+          vim.diagnostic.jump {
+            count = -1,
+            float = true,
+          }
+        end, 'Previous diagnostic')
 
-              apply_code_action { 'source.fixAll' }
-              apply_code_action { 'source.organizeImports' }
-            end
-          end,
-        })
+        map('n', '<leader>e', vim.diagnostic.open_float, 'Diagnostic float')
+
+        map('n', '<leader>q', vim.diagnostic.setloclist, 'Diagnostic list')
+
+        -- Signature help
+        map('i', '<M-k>', vim.lsp.buf.signature_help, 'Signature help')
+
+        -- Inlay hints
+        if client:supports_method 'textDocument/inlayHint' then
+          map('n', '<leader>lh', function()
+            local enabled = vim.lsp.inlay_hint.is_enabled {
+              bufnr = bufnr,
+            }
+
+            vim.lsp.inlay_hint.enable(not enabled, {
+              bufnr = bufnr,
+            })
+          end, 'Toggle inlay hints')
+        end
       end,
     })
-    -- vim.api.nvim_create_autocmd('LspAttach', {
-    --   desc = 'LSP actions',
-    --   callback = function(args)
-    --     local client = vim.lsp.get_client_by_id(args.data.client_id)
-    --     if not client then
-    --       return
-    --     end
-
-    --     -- Keymaps
-    --     local nmap = function(keys, func, desc)
-    --       if desc then
-    --         desc = 'LSP: ' .. desc
-    --       end
-    --       vim.keymap.set('n', keys, func, {
-    --         buffer = args.buf,
-    --         noremap = true,
-    --         silent = true,
-    --         desc = desc,
-    --       })
-    --     end
-
-    --     nmap('K', vim.lsp.buf.hover, 'Hover')
-    --     nmap('<leader>r', vim.lsp.buf.rename, 'Rename')
-    --     nmap('<leader>dr', vim.lsp.buf.references, 'References')
-    --     nmap('<leader>ca', vim.lsp.buf.code_action, 'Code action')
-    --     nmap('<leader>df', vim.lsp.buf.definition, 'Goto definition')
-    --     nmap('<leader>ds', '<cmd>vs | lua vim.lsp.buf.definition()<cr>', 'Goto definition (vsplit)')
-    --     nmap('<leader>dh', '<cmd>sp | lua vim.lsp.buf.definition()<cr>', 'Goto definition (hsplit)')
-    --     -- vtsls: jumps to actual .vue/.ts source instead of .d.ts declaration
-    --     if client.name == 'vtsls' then
-    --       nmap('<leader>dF', function()
-    --         client:exec_cmd({
-    --           title = 'goToSourceDefinition',
-    --           command = 'typescript.goToSourceDefinition',
-    --           arguments = { vim.uri_from_bufnr(args.buf), vim.lsp.util.make_position_params(0, client.offset_encoding).position },
-    --         }, { bufnr = args.buf })
-    --       end, 'Goto source definition')
-    --     end
-    --     nmap('<space>wa', vim.lsp.buf.add_workspace_folder, 'Add workspace folder')
-    --     nmap('<space>wr', vim.lsp.buf.remove_workspace_folder, 'Remove workspace folder')
-    --     nmap('<space>wl', function()
-    --       vim.print(vim.lsp.buf.list_workspace_folders())
-    --     end, 'List workspace folders')
-
-    --     -- Diagnostics
-    --     nmap('dn', function()
-    --       vim.diagnostic.jump { count = 1, float = true }
-    --     end, 'Next diagnostic')
-    --     nmap('dN', function()
-    --       vim.diagnostic.jump { count = -1, float = true }
-    --     end, 'Prev diagnostic')
-    --     nmap('<leader>q', vim.diagnostic.setloclist, 'Open diagnostics list')
-    --     nmap('<leader>e', vim.diagnostic.open_float, 'Open diagnostic float')
-
-    --     vim.keymap.set('i', '<M-t>', vim.lsp.buf.signature_help, { buffer = args.buf })
-
-    --     -- Inlay hints toggle
-    --     nmap('<leader>lh', function()
-    --       local enabled = vim.lsp.inlay_hint.is_enabled()
-    --       vim.lsp.inlay_hint.enable(not enabled)
-    --     end, 'Toggle inlay hints')
-
-    --     vim.api.nvim_buf_create_user_command(args.buf, 'Fmt', function(_)
-    --       vim.lsp.buf.format()
-    --     end, { desc = 'Format current buffer with LSP' })
-    --   end,
-    -- })
   end,
 }

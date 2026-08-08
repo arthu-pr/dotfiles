@@ -41,9 +41,8 @@
 --- It is recommended to use the same version of TypeScript in all packages, and therefore have it available in your workspace root. The location of the TypeScript binary will be determined automatically, but only once.
 ---
 ---
-local mason_registry = require('mason-registry')
-local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
-    '/node_modules/@vue/language-server'
+local vue_language_server_path =
+    vim.fn.expand('$MASON/packages/vue-language-server/node_modules/@vue/language-server')
 
 
 ---@type vim.lsp.Config
@@ -57,10 +56,8 @@ return {
   filetypes = {
     'javascript',
     'javascriptreact',
-    'javascript.jsx',
     'typescript',
     'typescriptreact',
-    'typescript.tsx',
     'vue'
   },
   root_dir = function(bufnr, on_dir)
