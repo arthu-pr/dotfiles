@@ -1,0 +1,27 @@
+name: Install smoke test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  symlinks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run set_symbolic_links.sh
+        run: printf "\n%s\nn\n" "$GITHUB_WORKSPACE" | bash set_symbolic_links.sh
+
+      - name: Verify key symlinks resolve into the repo
+        run: |
+          for link in ~/.config/nvim ~/.config/.vim ~/.vimrc ~/.zshrc ~/.zpreztorc; do
+            if [ ! -L "$link" ]; then
+              echo "::error::$link was not created as a symlink"
+              exit 1
+            fi
+            case "$(readlink -f "$link")" in
+              "$GITHUB_WORKSPACE"/*) echo "OK: $link -> $(readlink -f "$link")" ;;
+              *) echo "::error::$link resolves outside the repo: $(readlink -f "$link")"; exit 1 ;;
+            esac
+          done

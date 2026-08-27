@@ -2,6 +2,8 @@ local Snacks = require 'snacks'
 
 return {
   'folke/snacks.nvim',
+  priority = 1000,
+  lazy = false,
   opts = {
     picker = {},
     explorer = {},
@@ -416,6 +418,22 @@ return {
         Snacks.picker.icons { filter = { 'emoji' } }
       end,
       desc = 'Find Emoji',
+    },
+
+    -- TERMINAL
+    {
+      '<leader>st',
+      function()
+        Snacks.terminal()
+      end,
+      desc = 'Terminal',
+    },
+    {
+      '<leader>tt',
+      function()
+        Snacks.terminal.toggle()
+      end,
+      desc = 'Toggle Terminal',
     },
   },
 }

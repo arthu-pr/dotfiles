@@ -10,10 +10,10 @@ return {
       function()
         require('conform').format {
           async = true,
-          lsp_format = 'fallback',
+          -- lsp_format = 'fallback',
         }
       end,
-      mode = { 'n', 'v' },
+      mode = '',
       desc = 'Format buffer',
     },
   },
@@ -53,8 +53,10 @@ return {
     },
 
     format_on_save = {
-      timeout_ms = 1000,
-      lsp_format = 'fallback',
+      -- prettierd spins up a per-project daemon on first use; 500ms was too
+      -- tight and let cold starts (e.g. first css save after opening nvim)
+      -- time out with no formatting applied and no visible error.
+      timeout_ms = 3000,
     },
 
     formatters = {

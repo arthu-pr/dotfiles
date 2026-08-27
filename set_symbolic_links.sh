@@ -4,21 +4,17 @@
 # It will:
 # - Ask for the location of your config files
 # - Ask for the location of the target directory for the symbolic links
-# - Create symbolic links for all files inside folders in the current directory to the configuration directory (default .config)
-#  example: .config/nvim -> ~/config/nvim
-# - Create symbolic links for files listed in HOME_FILES in the home directory to the target directory (default current directory)
-#  example: .vimrc -> ~/config/.vimrc
+# - Create symbolic links for everything in this repo's config/config subfolder to the configuration
+#   directory (default .config)
+#  example: ~/.config/nvim -> ~/config/config/config/nvim
+# - Create symbolic links for everything in this repo's config/home subfolder to the home directory
+#  example: ~/.vimrc -> ~/config/config/home/.vimrc
+# - On macOS, also create symbolic links for everything in config/home-macos to the home directory
 #
 
 CONFIG_DIR="$HOME/.config"                                          # Configuration directory for directories
-HOME_FILES=(".vimrc" ".zpreztorc")                                  # List of files to link in the home directory
 TARGET_DIR="$HOME/config"                                           # Target directory for the symbolic links
 INCLUDE_DOTFILES="true"                                             # Include hidden files and directories by default
-
-
-
-
-  EXCLUDE_FOLDERS=("set_symbolic_links.sh" "Code" ".git" "README.md" "macos") # Add folders to exclude
 
 read -p "Enter your configuration directory (default $CONFIG_DIR): " custom_config_dir
 read -p "Enter the target directory for symbolic links (default $TARGET_DIR): " custom_target_dir
@@ -30,6 +26,8 @@ fi
 if [[ -n "$custom_target_dir" ]]; then
   TARGET_DIR="$custom_target_dir"
 fi
+
+CONFIG_SRC_DIR="$TARGET_DIR/config"
 
 mkdir -p "$CONFIG_DIR"
 mkdir -p "$TARGET_DIR"
@@ -66,40 +64,19 @@ create_symlink() {
   echo "Linked $target -> $source"
 }
 
-# Check if entry is in HOME_FILES, and if so, we return 0
-is_home_file() {
-  local file=$1
-  for home_file in "${HOME_FILES[@]}"; do
-    if [[ "$file" == "$home_file" ]]; then
-      return 0
-    fi
-  done
-  return 1
-}
-
-# Process regular files and directories in TARGET_DIR
-for entry_path in "$TARGET_DIR"/*; do
+# config/config/* -> $CONFIG_DIR/*
+for entry_path in "$CONFIG_SRC_DIR"/config/*; do
   entry="$(basename "$entry_path")"
-
-  if [[ " ${EXCLUDE_FOLDERS[*]} " =~ [[:space:]]${entry}[[:space:]] ]]; then
-    echo "Skipping excluded folder: $entry."
-    continue
-  fi
-
-  if is_home_file "$entry"; then
-    echo "Skipping $entry for $CONFIG_DIR."
-    continue
-  fi
-
   create_symlink "$entry_path" "$CONFIG_DIR/$entry"
 done
 
-# Process special home directory files
-for file in "${HOME_FILES[@]}"; do
-  create_symlink "$TARGET_DIR/$file" "$HOME/$file"
+# config/home/* -> $HOME/*
+for entry_path in "$CONFIG_SRC_DIR"/home/*; do
+  entry="$(basename "$entry_path")"
+  create_symlink "$entry_path" "$HOME/$entry"
 done
 
-# Process macOS-specific files
+# config/home-macos/* -> $HOME/* (macOS only)
 IS_MACOS="false"
 if [[ "$(uname)" == "Darwin" ]]; then
   IS_MACOS="true"
@@ -110,13 +87,10 @@ else
   fi
 fi
 
-if [[ "$IS_MACOS" == "true" && -d "$TARGET_DIR/macos" ]]; then
-  for file in "$TARGET_DIR"/macos/* "$TARGET_DIR"/macos/.*; do
-    filename="${file##*/}"
-    if [[ "$filename" == "." || "$filename" == ".." ]]; then
-      continue
-    fi
-    create_symlink "$file" "$HOME/$filename"
+if [[ "$IS_MACOS" == "true" ]]; then
+  for entry_path in "$CONFIG_SRC_DIR"/home-macos/*; do
+    entry="$(basename "$entry_path")"
+    create_symlink "$entry_path" "$HOME/$entry"
   done
 fi
 
