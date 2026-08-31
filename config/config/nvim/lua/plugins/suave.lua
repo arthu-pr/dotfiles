@@ -4,7 +4,7 @@ return {
     require('suave').setup {
       -- menu_height = 6,
       auto_save = {
-        enabled = false,
+        enabled = true,
         -- exclude_filetypes = {},
       },
       store_hooks = {
@@ -52,4 +52,3 @@ return {
     }
   end,
 }
-

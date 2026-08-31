@@ -229,7 +229,5 @@ call minpac#add('vim-jp/syntax-vim-ex')
 
 call minpac#add('romainl/Apprentice')
 
-
-
 " Load the plugins right now. (optional)
-"packloadalld()
+packloadall

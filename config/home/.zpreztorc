@@ -1,0 +1,73 @@
+#
+# Sets Prezto options.
+#
+# Authors:
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+
+# Set case-sensitivity for completion, history lookup, etc.
+# zstyle ':prezto:*:*' case-sensitive 'yes'
+
+# Color output (auto set to 'no' on dumb terminals).
+zstyle ':prezto:*:*' color 'yes'
+
+# Set the Prezto modules to load (browse modules).
+# The order matters.
+zstyle ':prezto:load' pmodule \
+  'environment' \
+  'terminal' \
+  'editor' \
+  'history' \
+  'directory' \
+  'spectrum' \
+  'utility' \
+  'completion' \
+  'history-substring-search' \
+  'prompt'
+
+# Set the key mapping style to 'emacs' or 'vi'.
+zstyle ':prezto:module:editor' key-bindings 'vi'
+
+#
+# Prompt
+#
+
+# Set the prompt theme to load.
+# Setting it to 'random' loads a random theme.
+# Auto set to 'off' on dumb terminals.
+zstyle ':prezto:module:prompt' theme 'pure'
+
+
+
+# zsh-only extras not covered by Prezto modules
+setopt HIST_IGNORE_SPACE INTERACTIVE_COMMENTS
+
+# "Using sudo with user dotfiles and aliases"
+# https://medium.com/@alexcg1/using-sudo-with-user-dotfiles-and-aliases-db76813007e
+alias nocorrectsudo='nocorrect sudo -E '
+
+# Cursor as blinking bar
+_fix_cursor() {
+  echo -ne '\e[5 q'
+}
+precmd_functions+=(_fix_cursor)
+
+# Shared shell-agnostic layer (deliberately ~/config, not ~/.config)
+[ -f "$HOME/config/terminal/init.sh" ] && . "$HOME/config/terminal/init.sh"
+
+
+# --------------------------------------------
+# Set additional custom rules if needed
+# source .zshrc.local only if it exists
+#
+if [ -f ~/.zshrc.local ]; then
+  source ~/.zshrc.local
+fi
+
+# --------------------------------------------
+# Set additional custom rules if needed
+# source .zpreztorc.local only if it exists
+#
+if [ -f ~/.zpreztorc.local ]; then
+  source ~/.zpreztorc.local
+fi
