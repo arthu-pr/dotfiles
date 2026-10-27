@@ -20,10 +20,14 @@ jobs:
       - name: Run symlinks setup
         run: printf "\n%s\nn\n" "$GITHUB_WORKSPACE" | bash ./set_symbolic_links.sh
 
+      # Plain download instead of rhysd/action-setup-vim, which fails on current runners
+      # (EXDEV when moving the extracted release from /tmp into $HOME).
       - name: Set up Neovim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: true
+        run: |
+          curl -fsSL https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz \
+            | tar xz -C "$HOME"
+          echo "$HOME/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+          "$HOME/nvim-linux-x86_64/bin/nvim" --version | head -1
 
       - name: Verify symlinks
         run: |
