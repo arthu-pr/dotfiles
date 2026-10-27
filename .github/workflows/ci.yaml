@@ -44,7 +44,7 @@ jobs:
       - name: Install Neovim plugins
         run: |
           timeout 300 nvim --headless "+Lazy! sync" +qa 2>&1 | tee /tmp/nvim_install.log
-          if grep -qE "E492|E5113|Error detected" /tmp/nvim_install.log; then
+          if grep -qE "E492|E5113|Error detected|# stacktrace|Failed to run" /tmp/nvim_install.log; then
             echo "::error::Plugin install failed"
             exit 1
           fi
@@ -59,7 +59,7 @@ jobs:
             echo "::error::Neovim exited with code $exit_code"
             exit 1
           fi
-          if grep -qE "E5113|Error detected|stack traceback" /tmp/nvim_test.log; then
+          if grep -qE "E5113|Error detected|stack traceback|# stacktrace|Failed to run" /tmp/nvim_test.log; then
             echo "::error::Lua errors on Neovim startup"
             exit 1
           fi
