@@ -1,0 +1,66 @@
+name: "Config CI"
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  install-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v6
+
+      # Answer the prompts explicitly: default config dir, this checkout as the target dir, and
+      # "n" to macOS-only configs. Piping `yes` answered "y" to the directory prompts and the
+      # step died on SIGPIPE under the runner's pipefail.
+      - name: Run symlinks setup
+        run: printf "\n%s\nn\n" "$GITHUB_WORKSPACE" | bash ./set_symbolic_links.sh
+
+      # Plain download instead of rhysd/action-setup-vim, which fails on current runners
+      # (EXDEV when moving the extracted release from /tmp into $HOME).
+      - name: Set up Neovim
+        run: |
+          curl -fsSL https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz \
+            | tar xz -C "$HOME"
+          echo "$HOME/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+          "$HOME/nvim-linux-x86_64/bin/nvim" --version | head -1
+
+      - name: Verify symlinks
+        run: |
+          echo "--- Symlinks created in ~/.config ---"
+          ls -la "$HOME/.config/" | grep "^l" || echo "(no symlinks found)"
+          if [ ! -L "$HOME/.config/nvim" ]; then
+            echo "::error::nvim symlink missing"
+            exit 1
+          fi
+          echo "OK: nvim -> $(readlink "$HOME/.config/nvim")"
+
+      # The first start bootstraps lazy.nvim and installs every plugin, so do that on its own
+      # before checking startup. nvim exits 0 even if `:Lazy` is missing, so check the output too.
+      - name: Install Neovim plugins
+        run: |
+          timeout 300 nvim --headless "+Lazy! sync" +qa 2>&1 | tee /tmp/nvim_install.log
+          if grep -qE "E492|E5113|Error detected|# stacktrace|Failed to run" /tmp/nvim_install.log; then
+            echo "::error::Plugin install failed"
+            exit 1
+          fi
+
+      - name: Test Neovim startup has no errors
+        run: |
+          set +e
+          timeout 60 nvim --headless +qa > /tmp/nvim_test.log 2>&1
+          exit_code=$?
+          cat /tmp/nvim_test.log
+          if [ $exit_code -ne 0 ]; then
+            echo "::error::Neovim exited with code $exit_code"
+            exit 1
+          fi
+          if grep -qE "E5113|Error detected|stack traceback|# stacktrace|Failed to run" /tmp/nvim_test.log; then
+            echo "::error::Lua errors on Neovim startup"
+            exit 1
+          fi
+          echo "OK: Neovim started and quit cleanly"
