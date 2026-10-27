@@ -8,6 +8,7 @@ local servers = {
   'eslint',
   'gh_actions_ls',
   'html',
+  'graphql',
   'jsonls',
   'lua_ls',
   'marksman',
@@ -76,8 +77,8 @@ return {
     -- Explicit vim.lsp.config() calls take priority over lsp/ runtime files,
     -- where nvim-lspconfig's defaults would win over ours for conflicting
     -- keys like `filetypes` (e.g. vtsls needs 'vue' added).
-    for file in vim.fs.dir(vim.fn.stdpath('config') .. '/lua/lsp') do
-      local name = file:match('^(.+)%.lua$')
+    for file in vim.fs.dir(vim.fn.stdpath 'config' .. '/lua/lsp') do
+      local name = file:match '^(.+)%.lua$'
       if name then
         vim.lsp.config(name, require('lsp.' .. name))
       end

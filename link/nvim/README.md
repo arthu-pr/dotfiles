@@ -4,11 +4,13 @@
 
 ### Themes
 
-- [bearded-nvim](https://github.com/Ferouk/bearded-nvim) — **Active default.** Neovim fork of the Bearded Themes collection (`feat-will` flavor, transparent).
-- [tokyonight.nvim](https://github.com/folke/tokyonight.nvim) — Tokyo Night colorscheme (storm style, transparent).
+- [tokyonight.nvim](https://github.com/folke/tokyonight.nvim) — Tokyo Night colorscheme.
+- [bearded-nvim](https://github.com/Ferouk/bearded-nvim) — Neovim fork of the Bearded Themes collection.
 - [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) — Japanese-inspired colorscheme with rich contrasts.
-- [everforest.nvim](https://github.com/sainnhe/everforest) — Soft, warm, pastel woodland colorscheme.
-- [synthweave.nvim](https://github.com/NvChad/synthweave.nvim) — Neon synthwave retro-futuristic theme.
+- [everforest](https://github.com/sainnhe/everforest) — Soft, warm, pastel woodland colorscheme.
+- [nightfox.nvim](https://github.com/EdenEast/nightfox.nvim) — Highly customizable theme family (nightfox, dayfox, nordfox, …).
+- [nordic.nvim](https://github.com/AlexvZyl/nordic.nvim) — Warmer, darker take on Nord.
+- [synthweave.nvim](https://github.com/samharju/synthweave.nvim) — Neon synthwave retro-futuristic theme.
 
 ### UI & Navigation
 
@@ -23,14 +25,14 @@
 
 ### LSP & Development
 
-- [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + [mason.nvim](https://github.com/mason-org/mason.nvim) — LSP server management and configuration.
-- [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) + [LuaSnip](https://github.com/L3MON4D3/LuaSnip) — Completion engine with snippet support (VSCode + Lua snippets).
+- [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + [mason.nvim](https://github.com/mason-org/mason.nvim) + [mason-lspconfig.nvim](https://github.com/mason-org/mason-lspconfig.nvim) — LSP server management and configuration.
+- [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) + [LuaSnip](https://github.com/L3MON4D3/LuaSnip) + [friendly-snippets](https://github.com/rafamadriz/friendly-snippets) — Completion engine with snippet support (VSCode + Lua snippets).
+- [conform.nvim](https://github.com/stevearc/conform.nvim) — Formatting, including format on save (prettierd etc.).
 - [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) — Better syntax highlighting and code structure parsing.
 - [nvim-ts-autotag](https://github.com/windwp/nvim-ts-autotag) — Auto-close & auto-rename HTML/TSX/Vue tags using Treesitter.
-- [nvim-html-css](https://github.com/Jezda1337/nvim-html-css) — CSS class/id intellisense in HTML, Vue, Astro, and more.
 - [neogen](https://github.com/danymat/neogen) — Generate annotations/docstrings for functions and classes.
 - [fidget.nvim](https://github.com/j-hui/fidget.nvim) — LSP progress notifications.
-- [neodev.nvim](https://github.com/folke/neodev.nvim) — Lua LSP enhancements for Neovim config development.
+- [nvim-html-css](https://github.com/Jezda1337/nvim-html-css) — CSS class/id intellisense in HTML, Vue, Astro, and more (currently disabled — `enabled = false`).
 
 ### Coding & Editing
 
@@ -47,7 +49,7 @@
 
 ### AI
 
-- [copilot.lua](https://github.com/zbirenbaum/copilot.lua) — GitHub Copilot integration.
+- [copilot.vim](https://github.com/github/copilot.vim) — GitHub Copilot integration.
 - [avante.nvim](https://github.com/yetone/avante.nvim) — Claude-powered AI coding assistant (currently disabled — see `disabled/avante.lua`).
 
 ### Database
@@ -60,15 +62,15 @@
 
 Several plugins have accumulated in `lua/plugins/disabled/` or are disabled inline. These are candidates for deletion:
 
-| File | Reason to delete |
-|------|-----------------|
-| `disabled/telescope.lua` | Replaced by `snacks.nvim` picker |
-| `disabled/fzf.lua` | Replaced by `snacks.nvim` picker |
-| `disabled/alpha-nvim.lua` | Replaced by `snacks.nvim` dashboard |
-| `disabled/commander.nvim` | Depended on Telescope (now gone) |
-| `disabled/simple-note.nvim` | Depended on Telescope (now gone) |
-| `disabled/conform.nvim` | Formatting handled by LSP; re-enable if explicit formatter config is needed |
-| `editor/typescript-tools.nvim` | Broken since Neovim ≥ 0.11.2; replaced by `vtsls` |
+| Plugin | File | Reason to delete |
+|--------|------|------------------|
+| telescope.nvim | `disabled/telescope.lua` | Replaced by `snacks.nvim` picker |
+| fzf-lua | `disabled/fzf.lua` | Replaced by `snacks.nvim` picker |
+| alpha-nvim | `disabled/alpha-nvim.lua` | Replaced by `snacks.nvim` dashboard |
+| commander.nvim | `disabled/commander.lua` | Depended on Telescope (now gone) |
+| simple-note.nvim | `disabled/simple-note.lua` | Depended on Telescope (now gone) |
+| conform.nvim | `disabled/conform.lua.OLD` | Old copy, superseded by the active `conform.lua` |
+| typescript-tools.nvim | `editor/typescript-tools.lua` | Broken since Neovim ≥ 0.11.2 (`enabled = false`); replaced by `vtsls` |
 
 Also note: **nvim-tree** and **snacks.explorer** are both active. `<leader>e` opens `Snacks.explorer()` while `<C-b>` toggles nvim-tree. Consider picking one.
 
