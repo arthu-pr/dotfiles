@@ -14,12 +14,12 @@ return {
       -- Empty by default, useful if one of the "opts" global settings
       -- doesn't work well in a specific filetype
       per_filetype = {
-        ['html'] = {
-          enable_close = false,
-        },
-        ['vue'] = {
-          enable_rename = false,
-        },
+        -- ['html'] = {
+        --   enable_close = false,
+        -- },
+        -- ['vue'] = {
+        --   enable_rename = false,
+        -- },
         astro = {
           enable_close = true,
           enable_rename = true,

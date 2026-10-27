@@ -29,8 +29,12 @@ nmap('<leader>gd', function()
 end, 'Open Diffview')
 
 -- Git Pickers (Snacks)
-nmap('<leader>gs', function() Snacks.picker.git_status() end, '[G]it [S]tatus')
-nmap('<leader>gst', function() Snacks.picker.git_stash() end, '[G]it [S]tash')
+nmap('<leader>gs', function()
+  Snacks.picker.git_status()
+end, '[G]it [S]tatus')
+nmap('<leader>gst', function()
+  Snacks.picker.git_stash()
+end, '[G]it [S]tash')
 
 -- Neogit
 -- local neogit = require 'neogit'
@@ -84,6 +88,50 @@ nmap('<leader>gst', function() Snacks.picker.git_stash() end, '[G]it [S]tash')
 -- end, 'LSP formatting')
 
 --
+-- HTML
+--
+local function wrap_html_selection()
+  -- Save visual selection
+  vim.cmd 'normal! gv"xd'
+  local text = vim.fn.getreg '"'
+
+  -- Insert <>selection</>
+  vim.api.nvim_put({ '<>' .. text .. '</>' }, 'c', true, true)
+
+  -- Move cursor between < and >
+  vim.cmd 'normal! 0l'
+  vim.cmd 'startinsert'
+
+  local augroup = vim.api.nvim_create_augroup('HtmlWrapSelection', { clear = true })
+
+  vim.api.nvim_create_autocmd('TextChangedI', {
+    group = augroup,
+    callback = function()
+      local line = vim.api.nvim_get_current_line()
+      local cursor = vim.api.nvim_win_get_cursor(0)
+
+      -- Opening tag, e.g. <strong>
+      local tag = line:match '^%s*<([%w:-]+)>'
+
+      if not tag then
+        return
+      end
+
+      -- Keep closing tag synchronized
+      local new_line = line:gsub('</[^>]*>', '</' .. tag .. '>')
+
+      if new_line ~= line then
+        vim.api.nvim_set_current_line(new_line)
+        vim.api.nvim_win_set_cursor(0, cursor)
+      end
+    end,
+  })
+end
+
+vim.keymap.set('v', '<leader>wt', wrap_html_selection, {
+  desc = 'Wrap selection with HTML tag',
+})
+
 -- File Explorer
 --
 keymap.set('n', '<C-x>', ':NvimTreeFocus<CR>')
