@@ -13,15 +13,14 @@ jobs:
     steps:
       - name: Checkout config repo
         uses: actions/checkout@v6
-        with:
-          path: config
 
+      # Answer the prompts explicitly: default config dir, this checkout as the target dir, and
+      # "n" to macOS-only configs. Piping `yes` answered "y" to the directory prompts and the
+      # step died on SIGPIPE under the runner's pipefail.
       - name: Run symlinks setup
-        run: |
-          cd config
-          yes | bash ./set_symbolic_links.sh
-          
-      - name: Set up Neovim and verify config
+        run: printf "\n%s\nn\n" "$GITHUB_WORKSPACE" | bash ./set_symbolic_links.sh
+
+      - name: Set up Neovim
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
@@ -30,30 +29,34 @@ jobs:
         run: |
           echo "--- Symlinks created in ~/.config ---"
           ls -la "$HOME/.config/" | grep "^l" || echo "(no symlinks found)"
-          echo ""
-          test -L "$HOME/.config/nvim" \
-            && echo "OK: nvim -> $(readlink $HOME/.config/nvim)" \
-            || (echo "FAIL: nvim symlink missing" && exit 1)
+          if [ ! -L "$HOME/.config/nvim" ]; then
+            echo "::error::nvim symlink missing"
+            exit 1
+          fi
+          echo "OK: nvim -> $(readlink "$HOME/.config/nvim")"
 
-      - name: Test Neovim headless startup
+      # The first start bootstraps lazy.nvim and installs every plugin, so do that on its own
+      # before checking startup. nvim exits 0 even if `:Lazy` is missing, so check the output too.
+      - name: Install Neovim plugins
         run: |
-          timeout 30 nvim --headless "+qa!" 2>&1 | tee /tmp/nvim_test.log || true
-          EXIT_CODE=${PIPESTATUS[0]}
+          timeout 300 nvim --headless "+Lazy! sync" +qa 2>&1 | tee /tmp/nvim_install.log
+          if grep -qE "E492|E5113|Error detected" /tmp/nvim_install.log; then
+            echo "::error::Plugin install failed"
+            exit 1
+          fi
+
+      - name: Test Neovim startup has no errors
+        run: |
+          set +e
+          timeout 60 nvim --headless +qa > /tmp/nvim_test.log 2>&1
+          exit_code=$?
           cat /tmp/nvim_test.log
-          if [[ $EXIT_CODE -ne 0 ]]; then
-            echo "FAIL: Neovim exited with code $EXIT_CODE"
+          if [ $exit_code -ne 0 ]; then
+            echo "::error::Neovim exited with code $exit_code"
+            exit 1
+          fi
+          if grep -qE "E5113|Error detected|stack traceback" /tmp/nvim_test.log; then
+            echo "::error::Lua errors on Neovim startup"
             exit 1
           fi
           echo "OK: Neovim started and quit cleanly"
-
-      - name: Test Neovim can load init.lua without errors
-        run: |
-          timeout 30 nvim --headless \
-            -c "lua vim.cmd('qa!')" \
-            2>&1 | tee /tmp/nvim_lua_test.log || true
-          if grep -qiE "error|E5113|stack traceback" /tmp/nvim_lua_test.log; then
-            echo "FAIL: Lua errors detected in Neovim startup"
-            cat /tmp/nvim_lua_test.log
-            exit 1
-          fi
-          echo "OK: No Lua errors on startup"
