@@ -170,8 +170,8 @@ nnoremap <C-L> :nohl<CR><C-L>
 " Own rules
 "
 " Set path for packages
-set runtimepath=~/.config/.vim
-set packpath=~/.config/.vim
+set runtimepath=~/.config/vim
+set packpath=~/.config/vim
 "set packpath=~/.vim8,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim8/after
 
 " https://stackoverflow.com/questions/16507777/set-encoding-and-fileencoding-to-utf-8-in-vim

@@ -22,24 +22,25 @@
 
     This script will:
     - Ask for the location of your config files (default: `~/.config`)
-    - Ask for the location of the target directory for the symbolic links (default: current directory where you cloned the repo)
-    - Create symbolic links for everything in `config/config/` to the configuration directory
-        - Example: `~/.config/nvim` &rarr; `~/config/config/config/nvim`
-    - Create symbolic links for everything in `config/home/` to the home directory
-        - Example: `~/.vimrc` &rarr; `~/config/config/home/.vimrc`, `~/.zshrc` &rarr; `~/config/config/home/.zshrc`
-    - On macOS, also create symbolic links for everything in `config/home-macos/` to the home directory
+    - Ask for the location of the target directory for the symbolic links (default: `link/` in the current directory where you cloned the repo)
+    - Create symbolic links for everything inside `link/` to the real local configuration directory.
+      - dot-prefixed entries go to the home directory, e.g. `~/.zshrc` &rarr; `~/config/.config/.zshrc`
+      - everything else goes to the configuration directory, e.g. `~/.config/nvim` &rarr; `~/config/.config/nvim`
+    - Ask whether to also link `.config/macos/` (same rule; defaults to yes on macOS, no elsewhere)
 
     To make zsh your default shell, run `chsh -s $(which zsh)`.
 
 ## Layout
 
-- `config/` holds everything that gets symlinked out to the live system. Where a file lives decides where
-  it's linked to, so adding a new tool's config is just a matter of dropping it in the right folder:
-    - `config/config/<name>` &rarr; `~/.config/<name>`
-    - `config/home/<name>` &rarr; `~/<name>`
-    - `config/home-macos/<name>` &rarr; `~/<name>` (macOS only)
-- `terminal/` is the shared, shell-agnostic base (exports, aliases, git aliases, functions) sourced by both `.bashrc` and `.zshrc` via `terminal/init.sh`. It is deliberately **not** symlinked into `~/.config` — the rc files source it directly from `~/config/terminal`.
-- `.zshrc` is the zsh entry point: it loads Prezto, adds zsh-only extras, then sources `terminal/init.sh`.
+- `.config/` holds everything that gets symlinked to the live system, all in one flat folder. The name
+  decides where it's linked, so adding a new tool's config just means dropping it in:
+  - `.config/.<name>` (dot-prefixed) &rarr; `~/.<name>`, e.g. `.zshrc`, `.vimrc`
+  - `.config/<name>` &rarr; `~/.config/<name>`, e.g. `nvim`, `kitty`, `vim`
+  - `.config/macos/` follows the same rule, but the script asks first, e.g. `.aerospace.toml` &rarr; `~/.aerospace.toml`
+- `utils/` is never symlinked: shell utilities sourced by path (see [`utils/README.md`](utils/README.md)).
+  - `utils/terminal/` is the shared, shell-agnostic base (exports, aliases, git aliases, functions), sourced by both `.bashrc` and `.zshrc` via `utils/terminal/init.sh`.
+  - `utils/ansible/` holds personal ansible-droplet helpers.
+- `.zshrc` is the zsh entry point: it loads Prezto, adds zsh-only extras, then sources `utils/terminal/init.sh`.
 - `.zpreztorc` contains only Prezto options (modules, key bindings, prompt theme).
 - Machine-local overrides go in `~/.zshrc.local` / `~/.bashrc.local` (sourced last, never committed).
 
