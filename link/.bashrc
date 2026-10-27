@@ -22,8 +22,10 @@ if ! shopt -oq posix; then
   [ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 fi
 
-# Shared shell-agnostic layer (deliberately ~/config, not ~/.config)
-[ -f "$HOME/config/terminal/init.sh" ] && . "$HOME/config/terminal/init.sh"
+# Shared shell-agnostic layer. The repo root is found by resolving this file's symlink
+# (~/.bashrc -> <repo>/link/.bashrc), so the clone can live anywhere.
+export DOTFILES_DIR="$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")"
+[ -f "$DOTFILES_DIR/utils/terminal/init.sh" ] && . "$DOTFILES_DIR/utils/terminal/init.sh"
 
 # --------------------------------------------
 # Set additional custom rules if needed

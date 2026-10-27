@@ -52,8 +52,10 @@ _fix_cursor() {
 }
 precmd_functions+=(_fix_cursor)
 
-# Shared shell-agnostic layer (deliberately ~/config, not ~/.config)
-[ -f "$HOME/config/terminal/init.sh" ] && . "$HOME/config/terminal/init.sh"
+# Shared shell-agnostic layer. The repo root is found by resolving this file's symlink
+# (~/.zpreztorc -> <repo>/link/.zpreztorc), so the clone can live anywhere.
+export DOTFILES_DIR="${${(%):-%x}:A:h:h}"
+[ -f "$DOTFILES_DIR/utils/terminal/init.sh" ] && . "$DOTFILES_DIR/utils/terminal/init.sh"
 
 
 # --------------------------------------------
