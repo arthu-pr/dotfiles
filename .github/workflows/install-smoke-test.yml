@@ -15,7 +15,7 @@ jobs:
 
       - name: Verify key symlinks resolve into the repo
         run: |
-          for link in ~/.config/nvim ~/.config/.vim ~/.vimrc ~/.zshrc ~/.zpreztorc; do
+          for link in ~/.config/nvim ~/.config/vim ~/.vimrc ~/.zshrc ~/.zpreztorc; do
             if [ ! -L "$link" ]; then
               echo "::error::$link was not created as a symlink"
               exit 1

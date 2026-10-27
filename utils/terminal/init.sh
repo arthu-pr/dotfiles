@@ -1,6 +1,7 @@
 # Shared shell-agnostic config, sourced by both .bashrc and .zshrc.
-# Lives at ~/config/terminal on purpose (not symlinked into ~/.config).
-_terminal_dir="$HOME/config/terminal"
+# Lives in the repo's utils/terminal on purpose (not symlinked into ~/.config).
+# DOTFILES_DIR is set by the rc file that sources this.
+_terminal_dir="$DOTFILES_DIR/utils/terminal"
 
 for _f in exports aliases git functions ssh; do
   [ -f "$_terminal_dir/$_f.sh" ] && . "$_terminal_dir/$_f.sh"
@@ -16,7 +17,7 @@ done
 # machines set up before this toggle existed) — skip with `echo no > ~/.config/dotfiles-ansible`.
 _ansible_marker="$HOME/.config/dotfiles-ansible"
 if [ ! -f "$_ansible_marker" ] || [ "$(cat "$_ansible_marker")" = "yes" ]; then
-  _ansible_dir="$HOME/config/ansible"
+  _ansible_dir="$DOTFILES_DIR/utils/ansible"
   for _f in init aliases functions; do
     [ -f "$_ansible_dir/$_f.sh" ] && . "$_ansible_dir/$_f.sh"
   done

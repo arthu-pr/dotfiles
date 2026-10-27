@@ -4,16 +4,16 @@
 # It will:
 # - Ask for the location of your config files
 # - Ask for the location of the target directory for the symbolic links
-# - Create symbolic links for everything in this repo's config/config subfolder to the configuration
-#   directory (default .config)
-#  example: ~/.config/nvim -> ~/config/config/config/nvim
-# - Create symbolic links for everything in this repo's config/home subfolder to the home directory
-#  example: ~/.vimrc -> ~/config/config/home/.vimrc
-# - On macOS, also create symbolic links for everything in config/home-macos to the home directory
+# - Create symbolic links for everything in this repo's link folder:
+#   - dot-prefixed entries go to the home directory, e.g. ~/.zshrc -> ~/config/link/.zshrc
+#   - everything else goes to the configuration directory (default .config),
+#     e.g. ~/.config/nvim -> ~/config/link/nvim
+# - Ask whether to link link/macos too (same rule), e.g. ~/.aerospace.toml -> ~/config/link/macos/.aerospace.toml
+# - utils/ is never linked (sourced by path from the rc files instead)
 #
 
 CONFIG_DIR="$HOME/.config"                                          # Configuration directory for directories
-TARGET_DIR="$HOME/config"                                           # Target directory for the symbolic links
+TARGET_DIR="$(cd "$(dirname "$0")" && pwd)"                         # Target directory for the symbolic links (this repo)
 INCLUDE_DOTFILES="true"                                             # Include hidden files and directories by default
 
 read -p "Enter your configuration directory (default $CONFIG_DIR): " custom_config_dir
@@ -27,7 +27,7 @@ if [[ -n "$custom_target_dir" ]]; then
   TARGET_DIR="$custom_target_dir"
 fi
 
-CONFIG_SRC_DIR="$TARGET_DIR/config"
+CONFIG_SRC_DIR="$TARGET_DIR/link"
 
 mkdir -p "$CONFIG_DIR"
 mkdir -p "$TARGET_DIR"
@@ -64,34 +64,31 @@ create_symlink() {
   echo "Linked $target -> $source"
 }
 
-# config/config/* -> $CONFIG_DIR/*
-for entry_path in "$CONFIG_SRC_DIR"/config/*; do
-  entry="$(basename "$entry_path")"
-  create_symlink "$entry_path" "$CONFIG_DIR/$entry"
-done
+# Link every entry of a folder: dot-prefixed -> $HOME, everything else -> $CONFIG_DIR
+link_entries() {
+  local src_dir=$1
 
-# config/home/* -> $HOME/*
-for entry_path in "$CONFIG_SRC_DIR"/home/*; do
-  entry="$(basename "$entry_path")"
-  create_symlink "$entry_path" "$HOME/$entry"
-done
+  for entry_path in "$src_dir"/*; do
+    local entry="$(basename "$entry_path")"
+    [[ "$entry" == ".DS_Store" || "$entry_path" == "$CONFIG_SRC_DIR/macos" ]] && continue
 
-# config/home-macos/* -> $HOME/* (macOS only)
-IS_MACOS="false"
-if [[ "$(uname)" == "Darwin" ]]; then
-  IS_MACOS="true"
-else
-  read -p "This does not appear to be macOS. Include macOS-specific configs anyway? (y/N): " macos_reply
-  if [[ "$macos_reply" == "y" || "$macos_reply" == "Y" ]]; then
-    IS_MACOS="true"
-  fi
-fi
-
-if [[ "$IS_MACOS" == "true" ]]; then
-  for entry_path in "$CONFIG_SRC_DIR"/home-macos/*; do
-    entry="$(basename "$entry_path")"
-    create_symlink "$entry_path" "$HOME/$entry"
+    if [[ "$entry" == .* ]]; then
+      create_symlink "$entry_path" "$HOME/$entry"
+    else
+      create_symlink "$entry_path" "$CONFIG_DIR/$entry"
+    fi
   done
+}
+
+link_entries "$CONFIG_SRC_DIR"
+
+# link/macos: ask, defaulting to yes on macOS and no elsewhere
+if [[ "$(uname)" == "Darwin" ]]; then
+  read -p "Link macOS-specific configs (link/macos)? (Y/n): " macos_reply
+  [[ "$macos_reply" != "n" && "$macos_reply" != "N" ]] && link_entries "$CONFIG_SRC_DIR/macos"
+else
+  read -p "This does not appear to be macOS. Link macOS-specific configs (link/macos) anyway? (y/N): " macos_reply
+  [[ "$macos_reply" == "y" || "$macos_reply" == "Y" ]] && link_entries "$CONFIG_SRC_DIR/macos"
 fi
 
 if [[ "$INCLUDE_DOTFILES" == "true" ]]; then
