@@ -1,0 +1,63 @@
+---@brief
+---
+--- https://github.com/vuejs/language-tools/tree/master/packages/language-server
+---
+--- The official language server for Vue
+---
+--- It can be installed via npm:
+--- ```sh
+--- npm install -g @vue/language-server
+--- ```
+---
+--- The language server only supports Vue 3 projects by default.
+--- For Vue 2 projects, [additional configuration](https://github.com/vuejs/language-tools/blob/master/extensions/vscode/README.md?plain=1#L19) are required.
+---
+--- The Vue language server works in "hybrid mode" that exclusively manages the CSS/HTML sections.
+--- You need the `vtsls` server with the `@vue/typescript-plugin` plugin to support TypeScript in `.vue` files.
+--- See `vtsls` section and https://github.com/vuejs/language-tools/wiki/Neovim for more information.
+---
+--- NOTE: Since v3.0.0, the Vue Language Server [no longer supports takeover mode](https://github.com/vuejs/language-tools/pull/5248).
+--
+-- SEE README FOR MORE DETAILS.
+
+---@type vim.lsp.Config
+return {
+  cmd = { 'vue-language-server', '--stdio' },
+  filetypes = { 'vue' },
+  root_markers = { 'package.json' },
+  on_init = function(client)
+    client.handlers['tsserver/request'] = function(_, result, context)
+      local vtsls_clients = vim.lsp.get_clients({ bufnr = context.bufnr, name = 'vtsls' })
+      local clients = {}
+
+      vim.list_extend(clients, vtsls_clients)
+
+      if #clients == 0 then
+        vim.notify('Could not find `vtsls` or `ts_ls` lsp client, `vue_ls` would not work without it.',
+          vim.log.levels.ERROR)
+        return
+      end
+      local ts_client = clients[1]
+
+      -- LuaJIT has no table.unpack (that's Lua 5.2+); use the global unpack
+      local param = unpack(result)
+      local id, command, payload = unpack(param)
+      ts_client:exec_cmd({
+        title = 'vue_request_forward', -- You can give title anything as it's used to represent a command in the UI, `:h Client:exec_cmd`
+        command = 'typescript.tsserverRequest',
+        arguments = {
+          command,
+          payload,
+        },
+      }, { bufnr = context.bufnr }, function(_, r)
+        local response = r and r.body
+        -- TODO: handle error or response nil here, e.g. logging
+        -- NOTE: Do NOT return if there's an error or no response, just return nil back to the vue_ls to prevent memory leak
+        local response_data = { { id, response } }
+
+        ---@diagnostic disable-next-line: param-type-mismatch
+        client:notify('tsserver/response', response_data)
+      end)
+    end
+  end,
+}

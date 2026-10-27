@@ -1,0 +1,45 @@
+{
+  "name": "custom-vscode-snippets",
+  "contributes": {
+    "snippets": [
+      {
+        "language": [
+          "html",
+          "css",
+          "javascript",
+          "typescript",
+          "vue"
+        ],
+        "path": "./web.code-snippets"
+      },
+      {
+        "language": "typescript",
+        "path": "./typescript.json"
+      },
+      {
+        "language": "vue",
+        "path": "./vue.json"
+      },
+      {
+        "language": "javascript",
+        "path": "./javascript.json"
+      },
+      {
+        "language": "json",
+        "path": "./package.json"
+      },
+      {
+        "language": "html",
+        "path": "./html.json"
+      },
+      {
+        "language": "css",
+        "path": "./css.json"
+      },
+      {
+        "language": "github-action",
+        "path": "./github-action.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+[DESKTOP 2 - Alacritty window]
+Description=DESKTOP 2 - Alacritty window
+desktopfile=Alacritty
+desktopfilerule=3
+desktops=80c62c9b-e216-420a-a5b5-64c449ed6b2b
+desktopsrule=2
+fullscreenrule=3
+ignoregeometry=true
+ignoregeometryrule=2
+maximizehoriz=true
+maximizehorizrule=3
+maximizevert=true
+maximizevertrule=3
+noborder=true
+noborderrule=3
+placement=9
+placementrule=2
+types=1
+wmclass=alacritty Alacritty
+wmclasscomplete=true
+wmclassmatch=1
+
+[Window settings for microsoft-edge]
+Description=Window settings for microsoft-edge
+blockcompositingrule=2
+desktops=80c62c9b-e216-420a-a5b5-64c449ed6b2b
+desktopsrule=2
+ignoregeometry=true
+ignoregeometryrule=3
+position=0,29
+positionrule=3
+size=968,1355
+sizerule=3
+title=Portfolio
+titlematch=2
+types=1
+wmclass=msedge microsoft-edge
+wmclasscomplete=true
+wmclassmatch=1
+
+[Window settings for routes.ts - portfolio (Workspace) - reteach MacOS M1 - Visual Studio Code - 7 problems in this file • Modified]
+Description=Window settings for routes.ts - portfolio (Workspace) - reteach MacOS M1 - Visual Studio Code - 7 problems in this file • Modified
+desktops=80c62c9b-e216-420a-a5b5-64c449ed6b2b
+desktopsrule=2
+ignoregeometry=true
+ignoregeometryrule=2
+position=968,29
+positionrule=4
+size=1592,1355
+sizerule=4
+title=portfolio (Workspace)
+titlematch=2
+wmclass=code code
+wmclasscomplete=true
+wmclassmatch=1

@@ -1,0 +1,66 @@
+{
+  "console.log": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!cl",
+    "body": ["console.log('$1');"]
+  },
+  "console.group": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!clg",
+    "body": [
+      "console.group(`$0`)",
+      "// Do another logging...",
+      "console.groupEnd()"
+    ]
+  },
+  "console.group buddy": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!cgg",
+    "body": [
+      "console.${3|group,groupCollapsed|}(`${1:group_label}`);",
+      "\t${2:// Do another logging...}",
+      "console.groupEnd();"
+    ],
+    "description": "console.group with collapsed option"
+  },
+  "console.table": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!clt",
+    "body": ["console.table('$2')"]
+  },
+  "console.dir": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!cld",
+    "body": ["console.dir('$1')"]
+  },
+  "console.log purple": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!clp",
+    "body": ["console.log('$1', 'color: purple, font-weight: bold');"]
+  },
+  "console.log red": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!clr",
+    "body": [
+      "console.log('%c$1', 'color: white; background-color: #c0272d, font-weight: bold', $2);"
+    ]
+  },
+  "import": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!import",
+    "body": ["import { $1 } from '$2'"],
+    "description": "ESM named import"
+  },
+  "default import": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!default import",
+    "body": ["import $1 from '$2'"],
+    "description": "ESM default import"
+  },
+  "export": {
+    "scope": "javascript,typescript,vue",
+    "prefix": "!export",
+    "body": ["export $1"],
+    "description": "ESM export"
+  }
+}

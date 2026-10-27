@@ -4,101 +4,93 @@
 # It will:
 # - Ask for the location of your config files
 # - Ask for the location of the target directory for the symbolic links
-# - Create symbolic links for all files inside folders in the current directory to the configuration directory (default .config)
-#  example: .config/nvim -> ~/config/nvim
-# - Create symbolic links for files listed in HOME_FILES in the home directory to the target directory (default current directory)
-#  example: .vimrc -> ~/config/.vimrc
+# - Create symbolic links for everything in this repo's link folder:
+#   - dot-prefixed entries go to the home directory, e.g. ~/.zshrc -> ~/config/link/.zshrc
+#   - everything else goes to the configuration directory (default .config),
+#     e.g. ~/.config/nvim -> ~/config/link/nvim
+# - Ask whether to link link/macos too (same rule), e.g. ~/.aerospace.toml -> ~/config/link/macos/.aerospace.toml
+# - utils/ is never linked (sourced by path from the rc files instead)
 #
 
 CONFIG_DIR="$HOME/.config"                                          # Configuration directory for directories
-HOME_FILES=(".vimrc" ".zpreztorc")                                  # List of files to link in the home directory
-TARGET_DIR="$HOME/config"                                           # Target directory for the symbolic links
+TARGET_DIR="$(cd "$(dirname "$0")" && pwd)"                         # Target directory for the symbolic links (this repo)
 INCLUDE_DOTFILES="true"                                             # Include hidden files and directories by default
-EXCLUDE_FOLDERS=("set_symbolic_links.sh" "Code" ".git" "README.md") # Add folders to exclude
 
 read -p "Enter your configuration directory (default $CONFIG_DIR): " custom_config_dir
 read -p "Enter the target directory for symbolic links (default $TARGET_DIR): " custom_target_dir
 
-# Use custom values if provided
 if [[ -n "$custom_config_dir" ]]; then
   CONFIG_DIR="$custom_config_dir"
 fi
 
 if [[ -n "$custom_target_dir" ]]; then
   TARGET_DIR="$custom_target_dir"
-  mkdir -p "$TARGET_DIR"
 fi
 
-# https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
-shopt -s dotglob
+CONFIG_SRC_DIR="$TARGET_DIR/link"
+
+mkdir -p "$CONFIG_DIR"
+mkdir -p "$TARGET_DIR"
+
+if [[ "$INCLUDE_DOTFILES" == "true" ]]; then
+  shopt -s dotglob
+fi
 shopt -s nullglob
-array=(*)
 
 # Function to create symbolic links
 create_symlink() {
   local source=$1
   local target=$2
 
-  # Check if the source exists, and ask for confirmation to overwrite
-  if [[ -e "$target" ]]; then
+  if [[ ! -e "$source" ]]; then
+    echo "Source does not exist: $source"
+    return
+  fi
+
+  if [[ -e "$target" || -L "$target" ]]; then
     echo "A file or directory already exists at $target."
-    read -p "Do you want to overwrite it with a symbolic link? (Y/n): " reply
+    read -p "Do you want to overwrite it with a symbolic link? (y/N): " reply
 
     if [[ "$reply" != "y" && "$reply" != "Y" ]]; then
-      echo "Skipping $source."
+      echo "Skipping $target."
       return
     fi
 
-    if [[ -d "$target" ]]; then
-      rm -rf "$target"
-    else
-      rm "$target"
-    fi
+    rm -rf "$target"
   fi
 
-  echo "Creating symbolic link for $source."
-
-  if [[ ! -e "$target" ]]; then
-    echo "Creating directory $target"
-    mkdir -p "$(dirname "$target")"
-  fi
-
+  mkdir -p "$(dirname "$target")"
   ln -s "$source" "$target"
+  echo "Linked $target -> $source"
 }
 
-# Check if entry is in HOME_FILES, and if so, we return 0
-is_home_file() {
-  local file=$1
-  for home_file in "${HOME_FILES[@]}"; do
-    if [[ "$file" == "$home_file" ]]; then
-      return 0
+# Link every entry of a folder: dot-prefixed -> $HOME, everything else -> $CONFIG_DIR
+link_entries() {
+  local src_dir=$1
+
+  for entry_path in "$src_dir"/*; do
+    local entry="$(basename "$entry_path")"
+    [[ "$entry" == ".DS_Store" || "$entry_path" == "$CONFIG_SRC_DIR/macos" ]] && continue
+
+    if [[ "$entry" == .* ]]; then
+      create_symlink "$entry_path" "$HOME/$entry"
+    else
+      create_symlink "$entry_path" "$CONFIG_DIR/$entry"
     fi
   done
-  return 1
 }
 
-# Process regular files and directories in CONFIG_DIR
-for entry in "${array[@]}"; do
-  if [[ " ${EXCLUDE_FOLDERS[@]} " =~ " ${entry} " ]]; then
-    echo "Skipping excluded folder: $entry."
-    continue
-  fi
+link_entries "$CONFIG_SRC_DIR"
 
-  # Skip if the entry is a home file (e.g. .vimrc, .zpreztorc) using is_home_file()
-  if is_home_file "$entry"; then
-    echo "Skipping $entry for $CONFIG_DIR."
-    continue
-  fi
+# link/macos: ask, defaulting to yes on macOS and no elsewhere
+if [[ "$(uname)" == "Darwin" ]]; then
+  read -p "Link macOS-specific configs (link/macos)? (Y/n): " macos_reply
+  [[ "$macos_reply" != "n" && "$macos_reply" != "N" ]] && link_entries "$CONFIG_SRC_DIR/macos"
+else
+  read -p "This does not appear to be macOS. Link macOS-specific configs (link/macos) anyway? (y/N): " macos_reply
+  [[ "$macos_reply" == "y" || "$macos_reply" == "Y" ]] && link_entries "$CONFIG_SRC_DIR/macos"
+fi
 
-  create_symlink "$TARGET_DIR/$entry" "$CONFIG_DIR/$entry"
-done
-
-# Process special home directory files
-for file in "${HOME_FILES[@]}"; do
-  create_symlink "$TARGET_DIR/$file" "$HOME/$file"
-done
-
-# Disable dotglob if it was enabled
 if [[ "$INCLUDE_DOTFILES" == "true" ]]; then
   shopt -u dotglob
 fi

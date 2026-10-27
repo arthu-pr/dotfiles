@@ -1,0 +1,52 @@
+{
+  "Vue Single File Component Setup Composition API with Typescript": {
+    "prefix": "vbase-3-ts-setup",
+    "body": [
+      "<template>",
+      "\t<div>",
+      "",
+      "\t</div>",
+      "</template>",
+      "",
+      "<script setup lang=\"ts\">",
+      "",
+      "</script>",
+      "",
+      "<style scoped>",
+      "",
+      "</style>"
+    ],
+    "description": "Base for Vue File Setup Composition API - Typescript"
+  },
+  "watch": {
+    "prefix": "watch",
+    "body": ["watch($1, ($2, $3) => {", "$0", "});"],
+    "description": "Watch over a reactive source and call a function in reaction to state changes"
+  },
+  "watchEffect-composition": {
+    "prefix": "watchEffect",
+    "body": ["watchEffect($1, ($2, $3) => {", "$0", "});"],
+    "description": "watchEffect from vue composition"
+  },
+  "Translation helper from i18n": {
+    "prefix": "!rtTranslate",
+    "body": ["const { rtTranslate } = useRtI18n('$1')"]
+  },
+  "setupi18n": {
+    "prefix": "!setup-i18n",
+    "body": [
+      "setup() {",
+      " const { rtTranslate } = useRtI18n('$1')",
+      "",
+      " return {",
+      "    rtTranslate",
+      "  }",
+      "},"
+    ]
+  },
+  "todonuxt3": {
+    "prefix": "!todonuxt3",
+    "body": "// TODO-NUXT-3: ${1:description}",
+    "description": "TODO comment for Nuxt 3 migration"
+  }
+}
